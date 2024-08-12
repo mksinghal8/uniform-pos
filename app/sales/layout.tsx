@@ -25,8 +25,8 @@ export default function RootLayout({
   return (
     <>
       <StaffLayout>
-        {/* <ECommerce/> */}
-        <ResizableDemo/>
+       {children}
+        {/* <ResizableDemo/> */}
         </StaffLayout>
     </>
   );

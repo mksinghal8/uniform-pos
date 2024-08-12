@@ -8,20 +8,12 @@ if (!storeId || !dukaanToken) {
 }
 
 const dukaanApi = ky.create({
-  prefixUrl: `https://api.mydukaan.io/api/seller-front/${storeId}/product-list/`,
+  prefixUrl: `https://api.mydukaan.io/api/`,
   headers: {
     'Content-Type': 'application/json',
     'authorization': `Bearer ${dukaanToken}`,
-  },
-  searchParams: {
-    ordering: '-created_at',
-    page: '1',
-    page_size: '30',
-    pop_fields: 'variants_data',
   },
   // Add other default options if needed
 });
 
 export default dukaanApi;
-
-// https://api.mydukaan.io/api/seller-front/{{store_uuid}}/product-list/?ordering=-created_at&page=1&page_size=30&pop_fields=variants_data
