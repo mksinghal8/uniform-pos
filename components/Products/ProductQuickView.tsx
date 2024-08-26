@@ -1,6 +1,6 @@
 'use client';
 
-import { Dispatch, SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import {
   Dialog,
   DialogBackdrop,
@@ -9,8 +9,8 @@ import {
   RadioGroup,
 } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { StarIcon } from '@heroicons/react/20/solid';
 import { useFetchAProduct } from '@/hooks/useFetchAProduct';
+import { generateVariantsData } from '@/utils/utils';
 
 const product = {
   name: 'Basic Tee 6-Pack ',
@@ -43,21 +43,25 @@ function classNames(...classes) {
 }
 
 interface ProductQuickViewProps {
-  quickViewOff:()=>void;
+  quickViewOff: () => void;
   productUuid: string;
-  open: boolean
+  open: boolean;
 }
 
 const ProductQuickView: React.FC<ProductQuickViewProps> = ({
   quickViewOff,
   productUuid,
-  open
+  open,
 }) => {
-  
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
 
-  const { isPending, isError, data:product_, error } = useFetchAProduct(productUuid);
+  const {
+    isPending,
+    isError,
+    data: product_,
+    error,
+  } = useFetchAProduct(productUuid);
 
   if (isPending) {
     return <span>Loading...</span>;
@@ -66,6 +70,8 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
   if (isError) {
     return <span>Error: {error.message}</span>;
   }
+
+  product_ && generateVariantsData(product_);
 
   return (
     <Dialog open={open} onClose={quickViewOff} className="relative z-10">
@@ -111,10 +117,11 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                       Product information
                     </h3>
 
-                    <p className="text-2xl text-gray-900">Rs. {product_.selling_price}</p>
+                    <p className="text-2xl text-gray-900">
+                      Rs. {product_.selling_price}
+                    </p>
 
                     {/* Reviews */}
-                    
                   </section>
 
                   <section aria-labelledby="options-heading" className="mt-10">
@@ -162,12 +169,6 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                           <div className="text-sm font-medium text-gray-900">
                             Size
                           </div>
-                          <a
-                            href="#"
-                            className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
-                          >
-                            Size guide
-                          </a>
                         </div>
 
                         <RadioGroup

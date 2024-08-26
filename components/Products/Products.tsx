@@ -43,14 +43,14 @@ function Products() {
       <div className="bg-white">
         <div className="mx-auto max-w-2xl px-4 py-4 sm:px-6 sm:py-4 lg:max-w-7xl lg:px-4">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900">
-            Customers also purchased
+            Our Products
           </h2>
 
-          <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-5 xl:gap-x-8">
+          <div className="mt-6 grid grid-cols-1 gap-x-5 gap-y-5 sm:grid-cols-3 lg:grid-cols-5 xl:gap-x-4">
             {filteredProducts?.length > 0 ? (
               filteredProducts.map((product: any) => (
                 <div
-                  className="Ishika"
+                  className="border-2 border-blue-950"
                   onClick={() => {
                     console.log('Product Clicked with uuid', product.uuid);
                     setOpen(true);
@@ -58,7 +58,6 @@ function Products() {
                   }}
                 >
                   <ProductCard key={product.id} product={product} />
-                  
                 </div>
               ))
             ) : (
