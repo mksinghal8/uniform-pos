@@ -13,7 +13,6 @@ const fetchProductDetails = async (productId: string): Promise<any> => {
 };
 
 export const useFetchAProduct = (productId: string) => {
-  console.log('\n\n\n\n\n\n', productId, '\n\n\n\n\n');
   const { isPending, isError, data, error } = useQuery({
     queryKey: ['product', productId],
     queryFn: () => fetchProductDetails(productId),

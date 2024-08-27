@@ -5,8 +5,6 @@ export function generateVariantsData(product) {
   //and needs to be changed.
   let attributes = {};
 
-  console.log('hey mayank Product is: ', product);
-
   //   Loop through each item in the data
   product.sku_data.forEach((item) => {
     item.attributes.forEach((attr) => {
@@ -29,17 +27,18 @@ export function generateVariantsData(product) {
 
   //now create object considering 2 available variants. 1 variant and no variant
 
-  console.log('Attributes: ', attributes);
-  console.log('Attributes Size: ', Object.keys(attributes).length);
-
   let variantsAvailable = Object.keys(attributes).length;
 
-  let variantData = {};
+  let PrimaryAttribute = findKeyWithSmallestArray(attributes);
+
+  let variantsInfo={}
+  let variantsData = {};
 
   if (variantsAvailable == 2) {
     //construct object
-
-    let PrimaryAttribute = findKeyWithSmallestArray(attributes);
+    variantsInfo["primaryLevelSelection"]=true;
+    variantsInfo["secondaryLevelSelection"]=true;
+    
     //loop again to make that new
     product.sku_data.forEach((item) => {
       let prime = ''; // Initialize prime
@@ -55,44 +54,44 @@ export function generateVariantsData(product) {
       });
 
       // Initialize nested objects if they don't exist
-      if (!variantData[prime]) {
-        variantData[prime] = {};
+      if (!variantsData[prime]) {
+        variantsData[prime] = {};
       }
 
-      // Assign the UUID to the correct place in the variantData object
-      variantData[prime][second] = {
+      // Assign the UUID to the correct place in the variantsData object
+      variantsData[prime][second] = {
         uuid: item.uuid,
         qty: item.inventory,
         original_price: item.original_price,
         selling_price: item.selling_price,
       };
-      variantData[prime]['zeta'] = {
-        total: variantData[prime]['zeta']?.total
-          ? variantData[prime]['zeta'].total + item.inventory
+      variantsData[prime]['zeta'] = {
+        total: variantsData[prime]['zeta']?.total
+          ? variantsData[prime]['zeta'].total + item.inventory
           : 0 + item.inventory,
-        maxPrice: variantData[prime]['zeta']?.maxPrice
-          ? Math.max(variantData[prime]['zeta'].maxPrice, item.selling_price)
+        maxPrice: variantsData[prime]['zeta']?.maxPrice
+          ? Math.max(variantsData[prime]['zeta'].maxPrice, item.selling_price)
           : item.selling_price,
-        minPrice: variantData[prime]['zeta']?.minPrice
-          ? Math.min(variantData[prime]['zeta'].minPrice, item.selling_price)
+        minPrice: variantsData[prime]['zeta']?.minPrice
+          ? Math.min(variantsData[prime]['zeta'].minPrice, item.selling_price)
           : item.selling_price,
       };
     });
   } else if (variantsAvailable == 1) {
-    console.log("darshu darshu ",variantsAvailable)
-    //construct object
-    let PrimaryAttribute = findKeyWithSmallestArray(attributes);
+    variantsInfo["primaryLevelSelection"]=false;
+    variantsInfo["secondaryLevelSelection"]=true;
+    //construct object 
     product.sku_data.forEach(item => {
         // Loop through each attribute of the item
         let prime = "";
         item.attributes.forEach(attr => {
-           // Assign the UUID to the correct place in the variantData object
+           // Assign the UUID to the correct place in the variantsData object
             if (attr.master_attribute === PrimaryAttribute) {
                 prime = attr.value;
             }
             
         });
-        variantData[prime] = {
+        variantsData[prime] = {
             uuid: item.uuid,
             qty: item.inventory,
             original_price: item.original_price,
@@ -100,10 +99,12 @@ export function generateVariantsData(product) {
         };
     });
   } else {
+    variantsInfo["primaryLevelSelection"]=false;
+    variantsInfo["secondaryLevelSelection"]=false;
     //construct object
     product.sku_data.forEach(item => {
         // Loop through each attribute of the item
-        variantData['item'] = {
+        variantsData['item'] = {
             uuid: item.uuid,
             qty: item.inventory,
             original_price: item.original_price,
@@ -111,7 +112,10 @@ export function generateVariantsData(product) {
         };
     });
   }
-  console.log("Variants Data is: ",variantData);
+  console.log("Variants Data is: ",variantsData);
+  variantsInfo = {...variantsInfo,variantsData};
+  console.log("Returning: ",variantsInfo)
+  return variantsInfo;
 }
 
 const findKeyWithSmallestArray = (obj) => {

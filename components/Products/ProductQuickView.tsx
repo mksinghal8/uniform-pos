@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogBackdrop,
@@ -56,12 +56,29 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
 
+  const [variantData, setVariantData] = useState({}); //whole object received when data fetched
+  const [selectedPrimaryVariant,setSelectedPrimaryVariant] = useState(); //radio value for selected
+  const [selectedSecondaryVariant,setSelectedSecondaryVariant] = useState(); //radio value for second selected
+
+  const [primaryVariantDetails, setPrimaryVariantDetails]=useState();
+  const [secondaryVariantDetails, setSecondaryVariantDetails] = useState({});// captures value of second level variant
+  const [selectedVariant, setSelectedVariant] = useState({}); // unique sku selected
+
   const {
     isPending,
     isError,
     data: product_,
     error,
   } = useFetchAProduct(productUuid);
+
+  useEffect(() => {
+    if(product_){
+      let variantData = generateVariantsData(product_)
+      setVariantData(variantData);
+      variantData.primaryLevelSelection ? setPrimaryVariantDetails(variantData.variantsData):null;
+      !variantData.primaryLevelSelection && variantData.secondaryLevelSelection ? setSecondaryVariantDetails(variantData.variantsData) : null;
+    }
+  }, [product_]);
 
   if (isPending) {
     return <span>Loading...</span>;
@@ -71,8 +88,13 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
     return <span>Error: {error.message}</span>;
   }
 
-  product_ && generateVariantsData(product_);
+  const getSecondVariant = (key) => {
+    setSelectedPrimaryVariant(key);
+    console.log("Selected var:",key)
+    setSecondaryVariantDetails(variantData.variantsData[key])
+  }
 
+  //product_ && generateVariantsData(product_);
   return (
     <Dialog open={open} onClose={quickViewOff} className="relative z-10">
       <DialogBackdrop
@@ -133,33 +155,58 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                       {/* Colors */}
                       <fieldset aria-label="Choose a color">
                         <legend className="text-sm font-medium text-gray-900">
-                          Color
+                          Primary Level Variant
                         </legend>
 
                         <RadioGroup
-                          value={selectedColor}
-                          onChange={setSelectedColor}
+                          value={selectedPrimaryVariant}
+                          onChange={getSecondVariant}
                           className="mt-4 flex items-center space-x-3"
                         >
-                          {product.colors.map((color) => (
-                            <Radio
-                              key={color.name}
-                              value={color}
-                              aria-label={color.name}
-                              className={classNames(
-                                color.selectedClass,
-                                'relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none data-[checked]:ring-2 data-[focus]:data-[checked]:ring data-[focus]:data-[checked]:ring-offset-1'
-                              )}
-                            >
-                              <span
-                                aria-hidden="true"
+                          {/* iske onselect pe secondary ko set kar do, fir secondary pe loop karo */}
+                          {variantData &&
+                            primaryVariantDetails &&
+                            Object.keys(primaryVariantDetails).map((key) => (
+                              <Radio
+                                key={key}
+                                value={key}
+                                disabled={false}
                                 className={classNames(
-                                  color.class,
-                                  'h-8 w-8 rounded-full border border-black border-opacity-10'
+                                  true
+                                    ? 'cursor-pointer bg-white text-gray-900 shadow-sm'
+                                    : 'cursor-not-allowed bg-gray-50 text-gray-200',
+                                  'group relative flex items-center justify-center rounded-md border px-4 py-3 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none data-[focus]:ring-2 data-[focus]:ring-indigo-500 sm:flex-1'
                                 )}
-                              />
-                            </Radio>
-                          ))}
+                              >
+                                <span>{key}</span>
+                                {true ? (
+                                  <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute -inset-px rounded-md border-2 border-transparent group-data-[focus]:border group-data-[checked]:border-indigo-500"
+                                  />
+                                ) : (
+                                  <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
+                                  >
+                                    <svg
+                                      stroke="currentColor"
+                                      viewBox="0 0 100 100"
+                                      preserveAspectRatio="none"
+                                      className="absolute inset-0 h-full w-full stroke-2 text-gray-200"
+                                    >
+                                      <line
+                                        x1={0}
+                                        x2={100}
+                                        y1={100}
+                                        y2={0}
+                                        vectorEffect="non-scaling-stroke"
+                                      />
+                                    </svg>
+                                  </span>
+                                )}
+                              </Radio>
+                            ))}
                         </RadioGroup>
                       </fieldset>
 
@@ -167,7 +214,7 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                       <fieldset aria-label="Choose a size" className="mt-10">
                         <div className="flex items-center justify-between">
                           <div className="text-sm font-medium text-gray-900">
-                            Size
+                            Secondary Level Variant
                           </div>
                         </div>
 
@@ -176,47 +223,48 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                           onChange={setSelectedSize}
                           className="mt-4 grid grid-cols-4 gap-4"
                         >
-                          {product.sizes.map((size) => (
-                            <Radio
-                              key={size.name}
-                              value={size}
-                              disabled={!size.inStock}
-                              className={classNames(
-                                size.inStock
-                                  ? 'cursor-pointer bg-white text-gray-900 shadow-sm'
-                                  : 'cursor-not-allowed bg-gray-50 text-gray-200',
-                                'group relative flex items-center justify-center rounded-md border px-4 py-3 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none data-[focus]:ring-2 data-[focus]:ring-indigo-500 sm:flex-1'
-                              )}
-                            >
-                              <span>{size.name}</span>
-                              {size.inStock ? (
-                                <span
-                                  aria-hidden="true"
-                                  className="pointer-events-none absolute -inset-px rounded-md border-2 border-transparent group-data-[focus]:border group-data-[checked]:border-indigo-500"
-                                />
-                              ) : (
-                                <span
-                                  aria-hidden="true"
-                                  className="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
-                                >
-                                  <svg
-                                    stroke="currentColor"
-                                    viewBox="0 0 100 100"
-                                    preserveAspectRatio="none"
-                                    className="absolute inset-0 h-full w-full stroke-2 text-gray-200"
+                          {secondaryVariantDetails &&
+                            Object.keys(secondaryVariantDetails).map((key) => (
+                              <Radio
+                                key={key}
+                                value={key}
+                                disabled={false}
+                                className={classNames(
+                                  true
+                                    ? 'cursor-pointer bg-white text-gray-900 shadow-sm'
+                                    : 'cursor-not-allowed bg-gray-50 text-gray-200',
+                                  'group relative flex items-center justify-center rounded-md border px-4 py-3 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none data-[focus]:ring-2 data-[focus]:ring-indigo-500 sm:flex-1'
+                                )}
+                              >
+                                <span>{key}</span>
+                                {true ? (
+                                  <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute -inset-px rounded-md border-2 border-transparent group-data-[focus]:border group-data-[checked]:border-indigo-500"
+                                  />
+                                ) : (
+                                  <span
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
                                   >
-                                    <line
-                                      x1={0}
-                                      x2={100}
-                                      y1={100}
-                                      y2={0}
-                                      vectorEffect="non-scaling-stroke"
-                                    />
-                                  </svg>
-                                </span>
-                              )}
-                            </Radio>
-                          ))}
+                                    <svg
+                                      stroke="currentColor"
+                                      viewBox="0 0 100 100"
+                                      preserveAspectRatio="none"
+                                      className="absolute inset-0 h-full w-full stroke-2 text-gray-200"
+                                    >
+                                      <line
+                                        x1={0}
+                                        x2={100}
+                                        y1={100}
+                                        y2={0}
+                                        vectorEffect="non-scaling-stroke"
+                                      />
+                                    </svg>
+                                  </span>
+                                )}
+                              </Radio>
+                            ))}
                         </RadioGroup>
                       </fieldset>
 
