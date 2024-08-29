@@ -6,8 +6,7 @@ const fetchProductDetails = async (productId: string): Promise<any> => {
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
-  //const data = await response.json();
-  //console.log("\n\n\n\n\n\nSinghal Ji:\n\n\n\n\n",data)
+
   const data = await response.json();
   return data.data;
 };
