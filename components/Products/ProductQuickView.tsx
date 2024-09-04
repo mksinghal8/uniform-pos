@@ -10,7 +10,7 @@ import {
 } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useFetchAProduct } from '@/hooks/useFetchAProduct';
-import { generateVariantsData, generateVariantsData_, generateVariantsData_2, generateVariantsData_22 } from '@/utils/utils';
+import { useSalesCartStore } from '@/store_zustand/salesCartStore2';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -40,48 +40,67 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
   const [secondaryVariantDetails, setSecondaryVariantDetails] = useState({}); // captures value of second level variant
   const [selectedVariant, setSelectedVariant] = useState({}); // unique sku selected
 
+  //zustand store states
+  const { cart, addToCart, removeFromCart } = useSalesCartStore(state => ({
+    cart: state.cart,
+    addToCart: state.addToCart,
+    removeFromCart: state.updateState
+  }));
+
+  // Handler to add product to the cart
+  const handleAddToCart = (selectedVariant) => {
+    addToCart(selectedVariant);
+  };
+
   const {
     isPending,
     isError,
-    data: product_,
+    customizedProductObject: product,
     error,
   } = useFetchAProduct(productUuid);
 
   //following useEffect runs on load of product and selects primary & secondary variant
 
   useEffect(() => {
-    if (product_) {
-      let productData = generateVariantsData_(product_);
-      setVariantData(productData);
-
-      if (productData.primaryAttribute) {
+    if (product) {
+  
+      if (product.variants.primaryAttribute) {
         //set primary variant details
-        setPrimaryVariantDetails(productData.variantsData);
+        setPrimaryVariantDetails(product.variants.data);
         //select primary variant details
-        let firstPrimarySelection = Object.keys(productData.variantsData)[0];
+        let firstPrimarySelection = Object.keys(product.variants.data)[0];
         setSelectedPrimaryVariant(firstPrimarySelection);
         //select secondary variant too
         setSecondaryVariantDetails(
-          productData.variantsData[firstPrimarySelection]
+          product.variants.data[firstPrimarySelection]
         );
+
+        let firstSecondarySelection = Object.keys(product.variants.data[firstPrimarySelection])[0];
+        setSelectedSecondaryVariant(firstSecondarySelection);
       }
 
-      if (!productData.primaryAttribute && productData.secondaryAttribute) {
-        setSecondaryVariantDetails(productData.variantsData);
+      if (!product.variants.primaryAttribute && product.variants.secondaryAttribute) {
+        setSecondaryVariantDetails(product.variants.data);
+        let firstSecondarySelection = Object.keys(product.variants.data)[0];
+        setSelectedSecondaryVariant(firstSecondarySelection);
       }
-      //select first from primary
-      console.log("MayaIsha: ",generateVariantsData_22(product_))
+
+      if(!product.variants.primaryAttribute && !product.variants.secondaryAttribute){
+        setSelectedVariant(product.variants.data.sku)
+      }
+
+      //select first from primary 
     }
     
-  }, [product_]);
+  }, [isPending]);
 
 
   //The following useEffect gets activated when secondaryLevel of variant is selected and finds unique product
   useEffect(()=>{
-    if(selectedPrimaryVariant){
-      setSelectedVariant(null);
-    }else{
-      setSelectedVariant(null);
+    if(selectedPrimaryVariant && selectedSecondaryVariant){
+      setSelectedVariant(product.variants.data[selectedPrimaryVariant][selectedSecondaryVariant]);
+    }else if(selectedSecondaryVariant){
+      setSelectedVariant(product.variants.data[selectedSecondaryVariant]);
     }
   },[selectedSecondaryVariant])
 
@@ -96,7 +115,7 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
   const getSecondVariant = (key) => {
     setSelectedPrimaryVariant(key);
     console.log('Selected var:', key);
-    setSecondaryVariantDetails(variantData.variantsData[key]);
+    setSecondaryVariantDetails(product.variants.data[key]);
   };
 
   //product_ && generateVariantsData(product_);
@@ -126,14 +145,14 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
               <div className="grid w-full grid-cols-1 items-start gap-x-6 gap-y-8 sm:grid-cols-12 lg:gap-x-8">
                 <div className="aspect-h-3 aspect-w-2 overflow-hidden rounded-lg bg-gray-100 sm:col-span-4 lg:col-span-5">
                   <img
-                    alt={product_.imageAlt}
-                    src={product_.all_images[0]}
+                    alt={product.imageAlt}
+                    src={product.all_images[0]}
                     className="object-cover object-center"
                   />
                 </div>
                 <div className="sm:col-span-8 lg:col-span-7">
                   <h2 className="text-2xl font-bold text-gray-900 sm:pr-12">
-                    {product_.name}
+                    {product.name}
                   </h2>
 
                   <section
@@ -145,7 +164,7 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                     </h3>
 
                     <p className="text-2xl text-gray-900">
-                      Rs. {product_.selling_price}
+                      Rs. {selectedVariant.selling_price}
                     </p>
 
                     {/* Reviews */}
@@ -158,10 +177,10 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
 
                     <form>
                       {/* Primary Attribute */}
-                      {variantData.primaryAttribute && (
+                      {product.variants.primaryAttribute && (
                         <fieldset aria-label="Choose a color">
                           <legend className="text-sm font-medium text-gray-900">
-                            {variantData.primaryAttribute}
+                            {product.variants.primaryAttribute}
                           </legend>
 
                           <RadioGroup
@@ -170,8 +189,7 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                             className="mt-4 flex items-center space-x-3"
                           >
                             {/* iske onselect pe secondary ko set kar do, fir secondary pe loop karo */}
-                            {variantData &&
-                              primaryVariantDetails &&
+                            {primaryVariantDetails &&
                               Object.keys(primaryVariantDetails).map((key) => (
                                 <div>
                                 <Radio
@@ -223,11 +241,11 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                       )}
 
                       {/* Secondary Attribute */}
-                      {variantData.secondaryAttribute && (
+                      {product.variants.secondaryAttribute && (
                         <fieldset aria-label="Choose a size" className="mt-10">
                           <div className="flex items-center justify-between">
                             <div className="text-sm font-medium text-gray-900">
-                              {variantData.secondaryAttribute}
+                              {product.variants.secondaryAttribute}
                             </div>
                           </div>
 
@@ -285,7 +303,7 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                                       )}
                                     </Radio>
                                     <p className='text-center text-green-500 font-medium text-sm'>
-                                      {secondaryVariantDetails[key].qty} left
+                                      {secondaryVariantDetails[key].inventory} left
                                     </p>
                                     </div>
                                   );
@@ -295,9 +313,10 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                         </fieldset>
                       )}
 
-                      <button
-                        type="submit"
-                        className="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      <button   
+                        type="button" 
+                        className={`mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+                        onClick={()=>handleAddToCart(selectedVariant)}
                       >
                         Add to bag
                       </button>

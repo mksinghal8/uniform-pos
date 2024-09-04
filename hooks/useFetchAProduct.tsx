@@ -1,3 +1,4 @@
+import { customizeProductObject } from '@/utils/utils';
 import { useQuery } from '@tanstack/react-query';
 
 const fetchProductDetails = async (productId: string): Promise<any> => {
@@ -19,5 +20,8 @@ export const useFetchAProduct = (productId: string) => {
     staleTime: Infinity,
   });
 
-  return { isPending, isError, data, error };
+  //let customizedProductObject = customizeProductObject(data);
+  const customizedProductObject = data ? customizeProductObject(data) : undefined;
+
+  return { isPending, isError, customizedProductObject, error };
 };

@@ -4,6 +4,7 @@ import ProductCard from './ProductCard';
 import { useFetchProducts } from '@/hooks/useFetchProducts';
 import { CategoryCarousel } from './CategoryCarousel';
 import ProductQuickView from './ProductQuickView';
+import SalesCart from './SalesCart';
 
 function Products() {
   const [open, setOpen] = useState(false);
@@ -22,7 +23,7 @@ function Products() {
   if (isError) return <div>Error: {isError}</div>;
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="mx-auto p-4">
       {/* Search Bar */}
       <div className="mb-4">
         <input

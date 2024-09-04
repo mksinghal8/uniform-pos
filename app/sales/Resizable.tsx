@@ -1,6 +1,7 @@
 'use client';
 import ECommerce from '@/components/Dashboard/E-commerce';
 import Products from '@/components/Products/Products';
+import SalesCart from '@/components/Products/SalesCart';
 import {
   ResizableHandle,
   ResizablePanel,
@@ -20,9 +21,7 @@ export function ResizableDemo() {
       </ResizablePanel>
       <ResizableHandle />
       <ResizablePanel defaultSize={20}>
-        <div className="flex h-[200px] items-center justify-center p-6">
-          <span className="font-semibold">One</span>
-        </div>
+        <SalesCart/>
       </ResizablePanel>
     </ResizablePanelGroup>
   );
