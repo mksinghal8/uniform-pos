@@ -1,14 +1,4 @@
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '../ui/dialog';
-import ProductDescriptionModal from './ProductDescriptionModal';
-import ProductQuickView from './ProductQuickView';
 
 function ProductCard(productDetails: any) {
   const { product } = productDetails;

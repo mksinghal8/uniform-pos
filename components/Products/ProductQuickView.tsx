@@ -41,16 +41,30 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
   const [selectedVariant, setSelectedVariant] = useState({}); // unique sku selected
 
   //zustand store states
-  const { cart, addToCart, removeFromCart } = useSalesCartStore(state => ({
+  const { cart, addToCart, updateCartItem} = useSalesCartStore(state => ({
     cart: state.cart,
     addToCart: state.addToCart,
-    removeFromCart: state.updateState
+    removeFromCart: state.updateState,
+    updateCartItem: state.updateCartItem
   }));
 
   // Handler to add product to the cart
-  const handleAddToCart = (selectedVariant) => {
-    addToCart(selectedVariant);
-  };
+  
+  const handleAddToCart = (productWithSelectedVariant) => {
+    // Check if the product already exists in the cart
+    const existingProductIndex = cart.findIndex(item => item.selectedVariant.id === productWithSelectedVariant.selectedVariant.id);
+
+    if (existingProductIndex !== -1) {
+        // Product exists, update its quantity
+        const existingCartItem = cart[existingProductIndex];
+        existingCartItem.quantityInCart=existingCartItem.quantityInCart+1;
+        updateCartItem(existingProductIndex,existingCartItem);
+    } else {
+        // Product does not exist, add it to the cart
+        productWithSelectedVariant.quantityInCart=1;
+        addToCart(productWithSelectedVariant);
+    }
+  }
 
   const {
     isPending,
@@ -102,7 +116,7 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
     }else if(selectedSecondaryVariant){
       setSelectedVariant(product.variants.data[selectedSecondaryVariant]);
     }
-  },[selectedSecondaryVariant])
+  },[selectedSecondaryVariant, selectedPrimaryVariant])
 
   if (isPending) {
     return <span>Loading...</span>;
@@ -316,7 +330,7 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                       <button   
                         type="button" 
                         className={`mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
-                        onClick={()=>handleAddToCart(selectedVariant)}
+                        onClick={()=>handleAddToCart({...product,selectedVariant:selectedVariant})}
                       >
                         Add to bag
                       </button>

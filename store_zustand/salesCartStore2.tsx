@@ -42,6 +42,7 @@ interface SalesCartStore {
   updateState: (partialState: Partial<SalesCartStore>) => void;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: number) => void;
+  updateCartItem: (index: number, updatedProduct: Partial<Product>) => void;
 }
 
 export const useSalesCartStore = create<SalesCartStore>((set) => ({
@@ -58,7 +59,14 @@ export const useSalesCartStore = create<SalesCartStore>((set) => ({
   addToCart: (product) => set(state => ({
     cart: [...state.cart, product]
   })),
-  removeFromCart: (productId) => set(state => ({
-    cart: state.cart.filter(product => product.id !== productId)
+  removeFromCart: (productIndex) => set(state => ({
+    cart: state.cart.filter((_, index) => index !== productIndex)
   })),
+  updateCartItem: (index, updatedProduct) => set(state => {
+    const updatedCart = [...state.cart];
+    if (index >= 0 && index < updatedCart.length) {
+      updatedCart[index] = { ...updatedCart[index], ...updatedProduct };
+    }
+    return { cart: updatedCart };
+  }),
 }));

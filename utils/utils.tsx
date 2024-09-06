@@ -56,8 +56,8 @@ export function customizeProductObject(product) {
 
   // 3. Initialize variant data
   const variantLevels = Object.keys(attributes).length;
-  const data = {};
   const variants = {};
+  const data = {};
 
   if (variantLevels === 2) {
     // Handle two-level variants
@@ -75,7 +75,7 @@ export function customizeProductObject(product) {
 
       const { attributes, ...rest } = sku;
       if (!data[prime]) data[prime] = {};
-      if (!data[prime][second]) data[prime][second] = { ...rest };
+      if (!data[prime][second]) data[prime][second] = { ...rest,primaryAttribute:prime,secondaryAttribute:second};
 
       const meta = data[prime]['meta'] || {};
       data[prime]['meta'] = {
