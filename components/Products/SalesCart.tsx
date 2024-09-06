@@ -33,48 +33,11 @@ const products = [
 ];
 
 export default function SalesCart() {
-  const [open, setOpen] = useState(true);
-
-  const { cart, addToCart, updateState, removeFromCart, updateCartItem } =
+  const { cart } =
     useSalesCartStore((state) => ({
       cart: state.cart,
-      addToCart: state.addToCart,
-      updateState: state.updateState,
-      removeFromCart: state.removeFromCart,
-      updateCartItem: state.updateCartItem,
     }));
 
-  const incrementCartItem = (productId) => {
-    // Check if the product already exists in the cart
-    const existingProductIndex = cart.findIndex(
-      (item) => item.id === productId
-    );
-
-    if (existingProductIndex !== -1) {
-      // Product exists, update its quantity
-      const existingCartItem = cart[existingProductIndex];
-      existingCartItem.quantityInCart = existingCartItem.quantityInCart + 1;
-      updateCartItem(existingProductIndex, existingCartItem);
-    }
-  };
-
-  const decrementCartItem = (productId) => {
-    // Check if the product already exists in the cart
-    const existingProductIndex = cart.findIndex(
-      (item) => item.id === productId
-    );
-
-    if (existingProductIndex !== -1) {
-      // Product exists, update its quantity
-      const existingCartItem = cart[existingProductIndex];
-      if (existingCartItem.quantityInCart == 1) {
-        removeFromCart(productId);
-      } else {
-        existingCartItem.quantityInCart = existingCartItem.quantityInCart - 1;
-        updateCartItem(existingProductIndex, existingCartItem);
-      }
-    }
-  };
 
   return (
     <div className="bg-white shadow">
