@@ -66,14 +66,21 @@ function CartItemProduct({ index, product }) {
   };
 
   const handlePrimaryVariantChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+   console.log("you selected",event.target.value);
     const newPrimaryVariant = event.target.value;
     setSelectedPrimaryVariant(newPrimaryVariant);
     //update selectedVariant
+    const updatedProduct = {...product};
+    updatedProduct.selectedVariant = updatedProduct.variants.data[newPrimaryVariant][selectedSecondaryVariant];
+    updateCartItem(index, updatedProduct);
   };
 
   const handleSecondaryVariantChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedSecondaryVariant(event.target.value);
     //update selectedVariant
+    const updatedProduct = {...product};
+    updatedProduct.selectedVariant = updatedProduct.variants.data[selectedPrimaryVariant][event.target.value];
+    updateCartItem(index, updatedProduct);
   };
 
   return (
