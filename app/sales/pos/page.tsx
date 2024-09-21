@@ -30,8 +30,6 @@ export default function Page() {
       <div className="w-3/12 fixed inset-y-0 right-0 bg-white shadow-lg mt-15">
         {/* <!-- Content inside the fixed right div --> */}
         <div className="">
-          <h2 className="text-xl font-semibold">Right Side</h2>
-          <p>Content here will be scrollable if it overflows.</p>
           {/* <!-- Add enough content here to make the right div scrollable --> */}
           <SalesCart/>
         </div>
