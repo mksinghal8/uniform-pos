@@ -23,31 +23,56 @@ function Products() {
   if (isError) return <div>Error: {isError}</div>;
 
   return (
-    <div className="mx-auto p-4">
+    <div className="mx-auto">
       {/* Search Bar */}
-      <div className="mb-4">
-        <input
-          className="w-1/5 p-2 border border-gray-300 rounded"
+      <div className="mb-2">
+        <label
+          htmlFor="default-search"
+          className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+        >
+          Search
+        </label>
+        <div className="relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg
+              className="w-4 h-4 text-gray-500 dark:text-gray-400"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 20 20"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+              />
+            </svg>
+          </div>
+          <input
+          className="w-1/5 px-8 py-2 border border-gray-300 rounded"
           type="text"
           placeholder="Search products..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
+        </div>
       </div>
 
       {/* Carousel */}
-      <div className="mb-4">
+      <div className="mb-2">
         <CategoryCarousel />
       </div>
 
       {/* Products Section */}
       <div className="bg-white">
-        <div className="mx-auto max-w-2xl px-4 py-4 sm:px-6 sm:py-4 lg:max-w-7xl lg:px-4">
+        <div className="mx-auto max-w-2xl px-2 sm:px-6 lg:max-w-7xl lg:px-4">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900">
             Our Products
           </h2>
 
-          <div className="mt-6 grid grid-cols-1 gap-x-5 gap-y-5 sm:grid-cols-3 lg:grid-cols-5 xl:gap-x-4">
+          <div className="mt-2 grid grid-cols-1 gap-x-5 gap-y-5 sm:grid-cols-3 lg:grid-cols-5 xl:gap-x-4">
             {filteredProducts?.length > 0 ? (
               filteredProducts.map((product: any) => (
                 <div
@@ -67,7 +92,13 @@ function Products() {
           </div>
         </div>
       </div>
-      {open && <ProductQuickView productUuid={selectedProduct} quickViewOff={quickViewOff} open={open}/>}
+      {open && (
+        <ProductQuickView
+          productUuid={selectedProduct}
+          quickViewOff={quickViewOff}
+          open={open}
+        />
+      )}
     </div>
   );
 }

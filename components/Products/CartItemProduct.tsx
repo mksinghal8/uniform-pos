@@ -66,22 +66,33 @@ function CartItemProduct({ index, product }) {
   };
 
   const handlePrimaryVariantChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-   console.log("you selected",event.target.value);
     const newPrimaryVariant = event.target.value;
+    console.log("You selected:", newPrimaryVariant);
+  
+    const updatedProduct = {
+      ...product,
+      selectedVariant: product.variants.data[newPrimaryVariant][selectedSecondaryVariant],
+    };
+  
     setSelectedPrimaryVariant(newPrimaryVariant);
-    //update selectedVariant
-    const updatedProduct = {...product};
-    updatedProduct.selectedVariant = updatedProduct.variants.data[newPrimaryVariant][selectedSecondaryVariant];
     updateCartItem(index, updatedProduct);
   };
+  
 
   const handleSecondaryVariantChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedSecondaryVariant(event.target.value);
-    //update selectedVariant
-    const updatedProduct = {...product};
-    updatedProduct.selectedVariant = updatedProduct.variants.data[selectedPrimaryVariant][event.target.value];
+    const selectedValue = event.target.value;
+    setSelectedSecondaryVariant(selectedValue);
+
+    const updatedProduct = { ...product };
+    const { primaryAttribute, data } = updatedProduct.variants;
+    
+    updatedProduct.selectedVariant = primaryAttribute 
+        ? data[selectedPrimaryVariant][selectedValue] 
+        : data[selectedValue];
+
     updateCartItem(index, updatedProduct);
-  };
+};
+
 
   return (
     <li className="space-y-3 py-6 text-left sm:flex-row sm:space-x-5 sm:space-y-0">

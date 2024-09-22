@@ -10,8 +10,8 @@ export default function SalesCart() {
     cart: state.cart,
   }));
 
-  const [customerName, setCustomerName] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("+91");
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('+91');
   const [subtotal, setSubTotal] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [cashByCustomer, setcashByCustomer] = useState(0);
@@ -33,11 +33,11 @@ export default function SalesCart() {
     setCustomerPhone(e.target.value);
   };
 
-
-
   const handleCashByCustomerChange = (e) => {
     setcashByCustomer(e.target.value);
   };
+
+
   useEffect(() => {
     const total = cart.reduce((acc, item) => {
       return acc + item.selectedVariant.selling_price * item.quantityInCart;
@@ -45,16 +45,20 @@ export default function SalesCart() {
     setSubTotal(total);
   }, [cart]);
 
+
   // Use the createOrder mutation
   const { mutate: createOrder, isLoading, error } = useCreateOrder();
 
   const handleCompleteOrder = () => {
     const orderData = {
-      line_items: cart.map(item => ({
+      line_items: cart.map((item) => ({
         sku: item.selectedVariant.uuid,
         quantity: item.quantityInCart,
       })),
-      mobile: customerPhone && customerPhone.length>9 ? customerPhone : "+91-9898989898", // Replace with customer phone number
+      mobile:
+        customerPhone && customerPhone.length > 9
+          ? customerPhone
+          : '+91-9898989898', // Replace with customer phone number
       buyer_pin: 'CUSTOMER_PIN', // Replace with customer pin
       address: {
         // Replace with actual address details
@@ -63,9 +67,12 @@ export default function SalesCart() {
         state: 'STATE_NAME',
         country: 'in',
         pin: 'PIN_CODE',
-        name: customerName ? customerName : "Walk In Customer",
+        name: customerName ? customerName : 'Walk In Customer',
         email: 'mksinghal8@gmail.com',
-        mobile: customerPhone && customerPhone.length>9 ? customerPhone : "+91-9898989898",
+        mobile:
+          customerPhone && customerPhone.length > 9
+            ? customerPhone
+            : '+91-9898989898',
       },
       manual_ship_charge: '0', // Example value
       manual_discount_type: 1,
@@ -80,17 +87,9 @@ export default function SalesCart() {
   return (
     <div className="bg-white shadow">
       <div className="py-6 sm:px-2 sm:py-4">
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 mb-2">
           {/* <!-- First Row --> */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label
-                htmlFor="salesman"
-                className="block text-sm font-medium text-gray-700"
-              >
-                SalesMan Name
-              </label>
-            </div>
             <div>
               <select
                 id="helper"
@@ -100,6 +99,14 @@ export default function SalesCart() {
                 <option>Helper 1</option>
                 <option>Helper 2</option>
               </select>
+            </div>
+            <div>
+              <label
+                htmlFor="salesman"
+                className="block text-sm font-medium text-gray-700"
+              >
+                SalesMan Name
+              </label>
             </div>
           </div>
           {/* <!-- Second Row --> */}
@@ -139,7 +146,7 @@ export default function SalesCart() {
           </div>
         </div>
 
-        <div className="flow-root h-100 overflow-y-auto">
+        <div className="flow-root h-115 overflow-y-auto">
           <ul className="p-1">
             {cart.map((product, index) => (
               <CartItemProduct index={index} product={product} />
@@ -147,7 +154,7 @@ export default function SalesCart() {
           </ul>
         </div>
 
-        <div className="border-t border-b">
+        <div className="border-t border-b mt-2">
           <div className="flex flex-col">
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-400">Subtotal</p>
@@ -233,7 +240,7 @@ export default function SalesCart() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mt-3 h-12">
+        <div className="grid grid-cols-2 gap-4 mt-1 h-12">
           {paymentMode === 'Cash' && (
             <>
               <div className="flex flex-col">
@@ -275,7 +282,7 @@ export default function SalesCart() {
           )}
         </div>
 
-        <div className="text-center mt-3">
+        <div className="text-center">
           <button
             className="w-full rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
             type="button"
