@@ -17,3 +17,5 @@ const dukaanApi = ky.create({
 });
 
 export default dukaanApi;
+
+//https://api.mydukaan.io/api/order/seller/order/
