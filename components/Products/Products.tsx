@@ -1,10 +1,12 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
 import { useFetchProducts } from '@/hooks/useFetchProducts';
 import { CategoryCarousel } from './CategoryCarousel';
 import ProductQuickView from './ProductQuickView';
 import SalesCart from './SalesCart';
+import useProductStore from '@/store_zustand/productStore';
+import { useFetchCategories } from '@/hooks/useFetchCategories';
 
 function Products() {
   const [open, setOpen] = useState(false);
@@ -19,8 +21,32 @@ function Products() {
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error: {isError}</div>;
+  //This is the store code
+  const {
+    allProducts,
+    allCategories,
+    searchString,
+    searchResultProducts,
+    searchResultCategories,
+    setAllProducts,
+    setAllCategories,
+    setSearchString,
+    setSearchResultProducts,
+    setSearchResultCategories,
+  } = useProductStore();
+  const {
+    data: categories,
+    isLoading: isCategoriesLoading,
+    error: isCategoriesError,
+  } = useFetchCategories();
+  useEffect(() => {
+    if (categories) setAllCategories(categories);
+  }, [isCategoriesLoading]);
+
+  //store code ends
+
+  if (isLoading || isCategoriesLoading) return <div>Loading...</div>;
+  if (isError || isCategoriesError) return <div>Error: {isError}</div>;
 
   return (
     <div className="mx-auto">
@@ -51,22 +77,21 @@ function Products() {
             </svg>
           </div>
           <input
-          className="w-1/5 px-8 py-2 border border-gray-300 rounded"
-          type="text"
-          placeholder="Search products..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+            className="w-1/5 px-8 py-2 border border-gray-300 rounded"
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-      </div>
-
-      {/* Carousel */}
-      <div className="mb-2">
-        <CategoryCarousel />
       </div>
 
       {/* Products Section */}
       <div className="bg-white">
+        {/* Carousel */}
+        <div className="mb-2 w-4/5 mx-auto">
+          {/* <CategoryCarousel /> */}
+        </div>
         <div className="mx-auto max-w-2xl px-2 sm:px-6 lg:max-w-7xl lg:px-4">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900">
             Our Products
