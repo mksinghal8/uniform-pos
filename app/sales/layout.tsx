@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
-import '.././globals.css'
+import '.././globals.css';
 
 import { cn } from '@/lib/utils';
 import StaffLayout from '@/components/Layouts/StaffLayout';
@@ -25,9 +25,9 @@ export default function RootLayout({
   return (
     <>
       <StaffLayout>
-       {children}
+        {children}
         {/* <ResizableDemo/> */}
-        </StaffLayout>
+      </StaffLayout>
     </>
   );
 }

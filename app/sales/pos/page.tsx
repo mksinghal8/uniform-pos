@@ -1,39 +1,37 @@
 import Products from '@/components/Products/Products';
+import Products2 from '@/components/Products/Products2';
 import SalesCart from '@/components/Products/SalesCart';
-import { Button } from '@/components/ui/button';
-import { ResizableDemo } from '../Resizable';
 
 export default function Page() {
   return (
-    // <div className="flex h-screen">
-    //   <div className="w-3/4 bg-gray-100 p-6">
-    //     <h1 className="text-2xl font-bold mb-4">Product Section</h1>
-    //     <Products />
-    //   </div>
+    <>
+      {/* Product Grid */}
+      <section className="w-9/12 bg-white shadow-md p-4">
+        <h2 className="text-xl font-bold mb-4">Products</h2>
+         {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          Sample Product Card */}
+          {/* {[...Array(9)].map((_, index) => (
+            <div
+              key={index}
+              className="border rounded-lg p-4 bg-gray-50 hover:shadow-lg"
+            >
+              <h3 className="font-bold">Product {index + 1}</h3>
+              <p className="text-gray-700">
+                Description of product {index + 1}
+              </p>
+              <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
+                Add to Cart
+              </button>
+            </div>
+          ))} */}
+        {/* </div> */}
+        <Products2/>
+      </section>
 
-    //   <div className="w-1/4 bg-white p-1 shadow-md">
-    //     <h2 className="text-xl font-bold mb-4">Sidebar</h2>
-    //     <SalesCart />
-    //   </div>
-    // </div>
-
-    <div className="flex">
-      {/* <!-- Left side div (70% width) --> */}
-      <div className="w-9/12 bg-gray-200 p-4">
-        {/* <!-- Your content for the left side --> */}
-        <h1 className="text-2xl font-bold">Left Side</h1>
-        <p>Your content here...</p>
-        <Products />
-      </div>
-
-      {/* <!-- Right side div (30% width) --> */}
-      <div className="w-3/12 fixed inset-y-0 right-0 bg-white shadow-lg mt-15">
-        {/* <!-- Content inside the fixed right div --> */}
-        <div className="">
-          {/* <!-- Add enough content here to make the right div scrollable --> */}
-          <SalesCart/>
-        </div>
-      </div>
-    </div>
+      {/* Cart Section */}
+      <aside className="fixed right-0 top-0 w-3/12 bg-white shadow-md p-4 h-full">
+        <SalesCart />
+      </aside>
+    </>
   );
 }

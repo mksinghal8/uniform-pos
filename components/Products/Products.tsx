@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
 import { useFetchProducts } from '@/hooks/useFetchProducts';
-import { CategoryCarousel } from './CategoryCarousel';
+import HorizontalCardScroll, { CategoryCarousel } from './CategoryCarousel';
 import ProductQuickView from './ProductQuickView';
 import SalesCart from './SalesCart';
 import useProductStore from '@/store_zustand/productStore';
@@ -86,12 +86,13 @@ function Products() {
         </div>
       </div>
 
+    
+        <h1 className="text-2xl font-bold mb-4">Horizontal Card Scroll</h1>
+        <HorizontalCardScroll />
+    
+
       {/* Products Section */}
       <div className="bg-white">
-        {/* Carousel */}
-        <div className="mb-2 w-4/5 mx-auto">
-          {/* <CategoryCarousel /> */}
-        </div>
         <div className="mx-auto max-w-2xl px-2 sm:px-6 lg:max-w-7xl lg:px-4">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900">
             Our Products

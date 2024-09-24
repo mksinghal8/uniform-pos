@@ -1,53 +1,29 @@
-import * as React from 'react';
+// ScrollableCardComponent.js
 
-import { Card, CardContent } from '@/components/ui/card';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
-import useProductStore from '@/store_zustand/productStore';
+import React from 'react';
 
-export function CategoryCarousel() {
-  const {
-    allCategories,
-  } = useProductStore();
+const HorizontalCardScroll = () => {
+  const cards = [
+    { id: 1, title: 'Card 1', content: 'Content for Card 1' },
+    { id: 2, title: 'Card 2', content: 'Content for Card 2' },
+    { id: 3, title: 'Card 3', content: 'Content for Card 3' },
+    { id: 4, title: 'Card 4', content: 'Content for Card 4' },
+    { id: 5, title: 'Card 5', content: 'Content for Card 5' },
+    // Add more cards as needed
+  ];
 
   return (
-    <Carousel
-      opts={{
-        align: 'start',
-      }}
-      className="w-full" // Ensure the carousel takes full width
-    >
-      <CarouselContent className="flex space-x-2"> {/* Add spacing between items */}
-        {allCategories.results.map((category) => (
-          <CarouselItem
-            key={category.id}
-            className="md:basis-1/6 lg:basis-1/8 sm:basis-1/4 xsm:basis-1/4 basis-1/4"
-          >
-            <div className="p-1">
-              <Card className="h-full"> {/* Make the card take full height */}
-                <CardContent className="flex aspect-square items-center justify-center p-6">
-                  {category.image ? (
-                    <img
-                      src={category.image}
-                      alt={category.name}
-                      className="object-cover h-full w-full"
-                    />
-                  ) : (
-                    <span className="text-3xl font-semibold">{category.name}</span>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </CarouselItem>
+    <div className="overflow-x-auto scrollbar-hidden">
+      <div className="flex space-x-4 p-4">
+        {cards.map((card) => (
+          <div key={card.id} className="flex-none w-64 h-40 bg-white shadow-md rounded-lg p-4">
+            <h2 className="font-bold text-lg">{card.title}</h2>
+            <p>{card.content}</p>
+          </div>
         ))}
-      </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
-    </Carousel>
+      </div>
+    </div>
   );
-}
+};
+
+export default HorizontalCardScroll;
