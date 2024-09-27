@@ -34,7 +34,7 @@ const ProductCard2: React.FC<ProductCardProps> = ({
             <span className="text-lg font-medium text-gray-700 line-through">
               {mrp}
             </span>
-            <span className="ml-4 text-lg font-semibold text-blue-600">
+            <span className="ml-4 text-lg font-semibold text-blue-600">Rs. 
               {price}
             </span>
           </div>
