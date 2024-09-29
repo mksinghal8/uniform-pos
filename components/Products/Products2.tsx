@@ -6,6 +6,7 @@ import useProductStore from '@/store_zustand/productStore';
 import { useFetchCategories } from '@/hooks/useFetchCategories';
 import ProductCard2 from './ProductCard2';
 import CategoriesSlider from './CategorySlider';
+import Modal from './Modal';
 
 const SearchBar = ({ searchQuery, setSearchQuery }) => {
   const handleInputChange = (event) => {
@@ -69,9 +70,9 @@ function Products2() {
 
   const [productSearchResults, setProductSearchResults] = useState(); //local state for product Search Results -> changed on Category Click too
   const [categorySearchResults, setCategorySearchResults] = useState();
+  const [isModalOpen, setModalOpen] = useState(false);
 
   const quickViewOff = () => setOpen(false);
-
 
   useEffect(() => {
     const searchResultsProduct = products?.filter((product: any) =>
@@ -85,26 +86,27 @@ function Products2() {
   }, [searchQuery]);
 
   //This is the store code
-  const {
-    allProducts,
-    allCategories,
-    setAllProducts,
-    setAllCategories,
-  } = useProductStore();
+  const { allProducts, allCategories, setAllProducts, setAllCategories } =
+    useProductStore();
 
   useEffect(() => {
     if (products) setAllProducts(products);
     if (categories) setAllCategories(categories.results);
   }, [isCategoriesLoading, isLoading]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setProductSearchResults(allProducts);
     setCategorySearchResults(allCategories);
-  },[allProducts, allCategories])
-
+  }, [allProducts, allCategories]);
 
   if (isLoading || isCategoriesLoading) return <div>Loading...</div>;
   if (isError || isCategoriesError) return <div>Error: {isError}</div>;
+
+  
+
+  const toggleModal = () => {
+    setModalOpen(!isModalOpen);
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -120,12 +122,19 @@ function Products2() {
         setSelectedProduct={setSelectedProduct}
       />
       {open && (
-        <ProductQuickView
-          productUuid={selectedProduct}
-          quickViewOff={quickViewOff}
-          open={open}
-        />
+        <div className='mr-80'>
+          <ProductQuickView
+            productUuid={selectedProduct}
+            quickViewOff={quickViewOff}
+            open={open}
+          />
+        </div>
       )}
+      <button onClick={toggleModal}>Open Modal</button>
+      <Modal isOpen={isModalOpen} onClose={toggleModal}>
+        <h2>Modal Content</h2>
+        <p>This is a simple modal that closes when you click outside of it.</p>
+      </Modal>
     </div>
   );
 }

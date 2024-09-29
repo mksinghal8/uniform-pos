@@ -27,7 +27,3 @@ export async function GET(
     });
   }
 }
-
-https://api.mydukaan.io/api/seller-front/74f35c17-fd28-4da9-a616-96a98be777ce/product-list/?category=12073031&direction=asc&ordering=position&page=1&page_size=30&pop_fields=variants_data
-
-https://api.mydukaan.io/api/seller-front/74f35c17-fd28-4da9-a616-96a98be777ce/product-list/?category=af1e2f01-bf39-488f-9efc-b975fa2fb2f1&direction=asc&ordering=position&page=1&page_size=30&pop_fields=variants_data

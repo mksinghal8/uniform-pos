@@ -27,9 +27,6 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
   productUuid,
   open,
 }) => {
-  // const [selectedColor, setSelectedColor] = useState(product.colors[0]);
-  // const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
-
   const [variantData, setVariantData] = useState({}); //whole object received when data fetched
   const [selectedPrimaryVariant, setSelectedPrimaryVariant] =
     useState<string>(); //radio value for selected
@@ -41,30 +38,34 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
   const [selectedVariant, setSelectedVariant] = useState({}); // unique sku selected
 
   //zustand store states
-  const { cart, addToCart, updateCartItem} = useSalesCartStore(state => ({
+  const { cart, addToCart, updateCartItem } = useSalesCartStore((state) => ({
     cart: state.cart,
     addToCart: state.addToCart,
     removeFromCart: state.updateState,
-    updateCartItem: state.updateCartItem
+    updateCartItem: state.updateCartItem,
   }));
 
   // Handler to add product to the cart
-  
+
   const handleAddToCart = (productWithSelectedVariant) => {
     // Check if the product already exists in the cart
-    const existingProductIndex = cart.findIndex(item => item.selectedVariant.id === productWithSelectedVariant.selectedVariant.id);
+    const existingProductIndex = cart.findIndex(
+      (item) =>
+        item.selectedVariant.id ===
+        productWithSelectedVariant.selectedVariant.id
+    );
 
     if (existingProductIndex !== -1) {
-        // Product exists, update its quantity
-        const existingCartItem = cart[existingProductIndex];
-        existingCartItem.quantityInCart=existingCartItem.quantityInCart+1;
-        updateCartItem(existingProductIndex,existingCartItem);
+      // Product exists, update its quantity
+      const existingCartItem = cart[existingProductIndex];
+      existingCartItem.quantityInCart = existingCartItem.quantityInCart + 1;
+      updateCartItem(existingProductIndex, existingCartItem);
     } else {
-        // Product does not exist, add it to the cart
-        productWithSelectedVariant.quantityInCart=1;
-        addToCart(productWithSelectedVariant);
+      // Product does not exist, add it to the cart
+      productWithSelectedVariant.quantityInCart = 1;
+      addToCart(productWithSelectedVariant);
     }
-  }
+  };
 
   const {
     isPending,
@@ -77,7 +78,6 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
 
   useEffect(() => {
     if (product) {
-  
       if (product.variants.primaryAttribute) {
         //set primary variant details
         setPrimaryVariantDetails(product.variants.data);
@@ -89,34 +89,42 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
           product.variants.data[firstPrimarySelection]
         );
 
-        let firstSecondarySelection = Object.keys(product.variants.data[firstPrimarySelection])[0];
+        let firstSecondarySelection = Object.keys(
+          product.variants.data[firstPrimarySelection]
+        )[0];
         setSelectedSecondaryVariant(firstSecondarySelection);
       }
 
-      if (!product.variants.primaryAttribute && product.variants.secondaryAttribute) {
+      if (
+        !product.variants.primaryAttribute &&
+        product.variants.secondaryAttribute
+      ) {
         setSecondaryVariantDetails(product.variants.data);
         let firstSecondarySelection = Object.keys(product.variants.data)[0];
         setSelectedSecondaryVariant(firstSecondarySelection);
       }
 
-      if(!product.variants.primaryAttribute && !product.variants.secondaryAttribute){
-        setSelectedVariant(product.variants.data.sku)
+      if (
+        !product.variants.primaryAttribute &&
+        !product.variants.secondaryAttribute
+      ) {
+        setSelectedVariant(product.variants.data.sku);
       }
 
-      //select first from primary 
+      //select first from primary
     }
-    
   }, [isPending]);
 
-
   //The following useEffect gets activated when secondaryLevel of variant is selected and finds unique product
-  useEffect(()=>{
-    if(selectedPrimaryVariant && selectedSecondaryVariant){
-      setSelectedVariant(product.variants.data[selectedPrimaryVariant][selectedSecondaryVariant]);
-    }else if(selectedSecondaryVariant){
+  useEffect(() => {
+    if (selectedPrimaryVariant && selectedSecondaryVariant) {
+      setSelectedVariant(
+        product.variants.data[selectedPrimaryVariant][selectedSecondaryVariant]
+      );
+    } else if (selectedSecondaryVariant) {
       setSelectedVariant(product.variants.data[selectedSecondaryVariant]);
     }
-  },[selectedSecondaryVariant, selectedPrimaryVariant])
+  }, [selectedSecondaryVariant, selectedPrimaryVariant]);
 
   if (isPending) {
     return <span>Loading...</span>;
@@ -206,48 +214,48 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                             {primaryVariantDetails &&
                               Object.keys(primaryVariantDetails).map((key) => (
                                 <div>
-                                <Radio
-                                  key={key}
-                                  value={key}
-                                  disabled={false}
-                                  className={classNames(
-                                    true
-                                      ? 'cursor-pointer bg-white text-gray-900 shadow-sm'
-                                      : 'cursor-not-allowed bg-gray-50 text-gray-200',
-                                    'group relative flex items-center justify-center rounded-md border px-4 py-3 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none data-[focus]:ring-2 data-[focus]:ring-indigo-500 sm:flex-1'
-                                  )}
-                                >
-                                  <span>{key}</span>
-                                  {true ? (
-                                    <span
-                                      aria-hidden="true"
-                                      className="pointer-events-none absolute -inset-px rounded-md border-2 border-transparent group-data-[focus]:border group-data-[checked]:border-indigo-500"
-                                    />
-                                  ) : (
-                                    <span
-                                      aria-hidden="true"
-                                      className="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
-                                    >
-                                      <svg
-                                        stroke="currentColor"
-                                        viewBox="0 0 100 100"
-                                        preserveAspectRatio="none"
-                                        className="absolute inset-0 h-full w-full stroke-2 text-gray-200"
+                                  <Radio
+                                    key={key}
+                                    value={key}
+                                    disabled={false}
+                                    className={classNames(
+                                      true
+                                        ? 'cursor-pointer bg-white text-gray-900 shadow-sm'
+                                        : 'cursor-not-allowed bg-gray-50 text-gray-200',
+                                      'group relative flex items-center justify-center rounded-md border px-4 py-3 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none data-[focus]:ring-2 data-[focus]:ring-indigo-500 sm:flex-1'
+                                    )}
+                                  >
+                                    <span>{key}</span>
+                                    {true ? (
+                                      <span
+                                        aria-hidden="true"
+                                        className="pointer-events-none absolute -inset-px rounded-md border-2 border-transparent group-data-[focus]:border group-data-[checked]:border-indigo-500"
+                                      />
+                                    ) : (
+                                      <span
+                                        aria-hidden="true"
+                                        className="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
                                       >
-                                        <line
-                                          x1={0}
-                                          x2={100}
-                                          y1={100}
-                                          y2={0}
-                                          vectorEffect="non-scaling-stroke"
-                                        />
-                                      </svg>
-                                    </span>
-                                  )}
-                                </Radio>
-                                <p className='text-center text-green-500 font-medium text-sm'>
-                                      {primaryVariantDetails[key].meta.total} left
-                                    </p>
+                                        <svg
+                                          stroke="currentColor"
+                                          viewBox="0 0 100 100"
+                                          preserveAspectRatio="none"
+                                          className="absolute inset-0 h-full w-full stroke-2 text-gray-200"
+                                        >
+                                          <line
+                                            x1={0}
+                                            x2={100}
+                                            y1={100}
+                                            y2={0}
+                                            vectorEffect="non-scaling-stroke"
+                                          />
+                                        </svg>
+                                      </span>
+                                    )}
+                                  </Radio>
+                                  <p className="text-center text-green-500 font-medium text-sm">
+                                    {primaryVariantDetails[key].meta.total} left
+                                  </p>
                                 </div>
                               ))}
                           </RadioGroup>
@@ -276,49 +284,49 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
 
                                   return (
                                     <div>
-                                    <Radio
-                                      key={key}
-                                      value={key}
-                                      disabled={false}
-                                      className={classNames(
-                                        true
-                                          ? 'cursor-pointer bg-white text-gray-900 shadow-sm'
-                                          : 'cursor-not-allowed bg-gray-50 text-gray-200',
-                                        'group relative flex items-center justify-center rounded-md border px-4 py-3 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none data-[focus]:ring-2 data-[focus]:ring-indigo-500 sm:flex-1'
-                                      )}
-                                    >
-                                      <span>{key}</span>
-                                      {true ? (
-                                        <span
-                                          aria-hidden="true"
-                                          className="pointer-events-none absolute -inset-px rounded-md border-2 border-transparent group-data-[focus]:border group-data-[checked]:border-indigo-500"
-                                        />
-                                      ) : (
-                                        <span
-                                          aria-hidden="true"
-                                          className="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
-                                        >
-                                          <svg
-                                            stroke="currentColor"
-                                            viewBox="0 0 100 100"
-                                            preserveAspectRatio="none"
-                                            className="absolute inset-0 h-full w-full stroke-2 text-gray-200"
+                                      <Radio
+                                        key={key}
+                                        value={key}
+                                        disabled={false}
+                                        className={classNames(
+                                          true
+                                            ? 'cursor-pointer bg-white text-gray-900 shadow-sm'
+                                            : 'cursor-not-allowed bg-gray-50 text-gray-200',
+                                          'group relative flex items-center justify-center rounded-md border px-4 py-3 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none data-[focus]:ring-2 data-[focus]:ring-indigo-500 sm:flex-1'
+                                        )}
+                                      >
+                                        <span>{key}</span>
+                                        {true ? (
+                                          <span
+                                            aria-hidden="true"
+                                            className="pointer-events-none absolute -inset-px rounded-md border-2 border-transparent group-data-[focus]:border group-data-[checked]:border-indigo-500"
+                                          />
+                                        ) : (
+                                          <span
+                                            aria-hidden="true"
+                                            className="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
                                           >
-                                            <line
-                                              x1={0}
-                                              x2={100}
-                                              y1={100}
-                                              y2={0}
-                                              vectorEffect="non-scaling-stroke"
-                                            />
-                                          </svg>
-                                        </span>
-                                        
-                                      )}
-                                    </Radio>
-                                    <p className='text-center text-green-500 font-medium text-sm'>
-                                      {secondaryVariantDetails[key].inventory} left
-                                    </p>
+                                            <svg
+                                              stroke="currentColor"
+                                              viewBox="0 0 100 100"
+                                              preserveAspectRatio="none"
+                                              className="absolute inset-0 h-full w-full stroke-2 text-gray-200"
+                                            >
+                                              <line
+                                                x1={0}
+                                                x2={100}
+                                                y1={100}
+                                                y2={0}
+                                                vectorEffect="non-scaling-stroke"
+                                              />
+                                            </svg>
+                                          </span>
+                                        )}
+                                      </Radio>
+                                      <p className="text-center text-green-500 font-medium text-sm">
+                                        {secondaryVariantDetails[key].inventory}{' '}
+                                        left
+                                      </p>
                                     </div>
                                   );
                                 }
@@ -327,10 +335,15 @@ const ProductQuickView: React.FC<ProductQuickViewProps> = ({
                         </fieldset>
                       )}
 
-                      <button   
-                        type="button" 
+                      <button
+                        type="button"
                         className={`mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
-                        onClick={()=>handleAddToCart({...product,selectedVariant:selectedVariant})}
+                        onClick={() =>
+                          handleAddToCart({
+                            ...product,
+                            selectedVariant: selectedVariant,
+                          })
+                        }
                       >
                         Add to bag
                       </button>

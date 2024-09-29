@@ -26,7 +26,7 @@ export default function RootLayout({
     <>
       <AdminLayout>
         {children}
-        <ECommerce />
+        {/* <ECommerce /> */}
       </AdminLayout>
     </>
   );
