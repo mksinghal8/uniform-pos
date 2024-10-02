@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import CartItemProduct from './CartItemProduct';
 import useCreateOrder from '@/hooks/useCreateOrder';
 import Bill from './Bill';
-import { generateBillTemplate } from '@/utils/utils';
+import { formatSalesRecordData, generateBillTemplate } from '@/utils/utils';
+import { useCreateSalesRecord } from '@/hooks/useCreateSalesRecord';
 
 export default function SalesCart2() {
   const iframeRef = useRef();
@@ -61,8 +62,38 @@ export default function SalesCart2() {
   }, [cart]);
 
   // Use the createOrder mutation
-  const { mutate: createOrder, isLoading, error } = useCreateOrder();
+  const {
+    mutate: createOrder,
+    isPending: pendingCreateOrder,
+    error,
+  } = useCreateOrder();
 
+  const {
+    mutate: createSalesRecord,
+    isPending: pendingCreateSalesRecord,
+    error: createSalesRecordError,
+  } = useCreateSalesRecord();
+
+  const fakeSalesRecord = {
+    "products": [
+        {
+            "uuid": "555f9bc6-dd28-45f8-88b0-ae4d3dbe9494",
+            "name": "PURPLE CHECK KURTI",
+            "imageUrl": "https://dms.mydukaan.io/original/jpeg/upload_file_service/0ded8676-f245-499d-82ac-bb54cf85355f/purplecheckkurti1.jpg",
+            "sellingPrice": "230.00",
+            "categories": [
+                "SARVODYA KANYA VIDYALAYA BURARI"
+            ],
+            "quantity": 1
+        }
+    ],
+    "totalAmount": 220.34,
+    "totalItems": 1,
+    "discount": 0,
+    "salesman": "Rahul",
+    "helper": "Mukul",
+    "type": "Cash"
+}
   const handleCompleteOrder = () => {
     const orderData = {
       line_items: cart.map((item) => ({
@@ -72,15 +103,14 @@ export default function SalesCart2() {
       mobile:
         customerPhone && customerPhone.length > 9
           ? customerPhone
-          : '+91-9898989898', // Replace with customer phone number
+          : '+91-9898989898', // Consider validating the phone format
       buyer_pin: 'CUSTOMER_PIN', // Replace with customer pin
       address: {
-        // Replace with actual address details
-        line: 'ADDRESS_LINE',
+        line: 'ADDRESS_LINE', // Replace with actual address details
         city: 'CITY_NAME',
         state: 'STATE_NAME',
         country: 'in',
-        pin: 'PIN_CODE',
+        pin: 'PIN_CODE', // Replace with actual pin code
         name: customerName ? customerName : 'Walk In Customer',
         email: 'mksinghal8@gmail.com',
         mobile:
@@ -92,18 +122,39 @@ export default function SalesCart2() {
       manual_discount_type: 1,
       manual_discount_value: String(discount),
       notes: 'Order notes',
-      payment_mode: 0, // Example mapping
+      payment_mode: 0, // Ensure this corresponds to actual payment modes
     };
-    //createOrder(orderData);
-    
-    handlePrint({
-      customerDetails: { customerName, customerPhone },
-      cart,
-      discount,
-      paymentMode,
-    });
-    //=>Create customer
-    //=>Add salesman record
+
+    // createOrder(orderData, {
+    //   onSuccess: (resp) => {
+    //     console.log("This is the response of the order: ", resp);
+    //     handlePrint({
+    //       customerDetails: { customerName, customerPhone },
+    //       cart,
+    //       discount,
+    //       paymentMode,
+    //     });
+    //   },
+    //   onError: (error) => {
+    //     console.error("Error completing the order:", error);
+    //   },
+    // });
+
+    createSalesRecord(
+      formatSalesRecordData({
+        cart,
+        customerName,
+        customerPhone,
+        salesMan: 'SalesMan',
+        helper: 'helper',
+        type: 'Sales',
+        paymentMode,
+        subtotal:'',
+        discount
+      })
+    );
+
+   // createSalesRecord(fakeSalesRecord);
   };
 
   return (
@@ -298,7 +349,7 @@ export default function SalesCart2() {
         className="mt-4 bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
         type="button"
         onClick={handleCompleteOrder}
-        disabled={isLoading}
+        disabled={pendingCreateOrder}
       >
         Process Order
       </button>

@@ -40,16 +40,19 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 
 // Styles (customize as needed)
 const overlayStyle: React.CSSProperties = {
-  position: 'fixed',
-  top: 0,
-  left: '4%',
-  right: '25%',
-  bottom: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-};
+    position: 'fixed',
+    top: 0,
+    left: '4%',
+    right: '25%',
+    bottom: 0,
+    backdropFilter: 'blur(4px)', // Adjust the blur value as needed
+    backgroundColor: 'rgba(255, 255, 255, 0.1)', // Optional: a semi-transparent background to enhance the effect
+  
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  };
+  
 
 const modalStyle: React.CSSProperties = {
   background: 'white',

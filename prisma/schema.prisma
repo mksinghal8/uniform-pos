@@ -20,3 +20,14 @@ model User {
   hashedPassword        String
   role                  String?
 }
+
+model SalesRecord {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  products    Json 
+  totalItems  Int
+  discount    Float     
+  totalAmount Float     
+  salesman    String    
+  helper      String    
+  type        String    
+}

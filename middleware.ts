@@ -16,21 +16,26 @@ export default async function middleware(req: NextRequest) {
     }
 
     const cookie = req.cookies.get('session')?.value;
-    const session = await decrypt(cookie);
+    const session = cookie ? await decrypt(cookie) : null;
 
+    // No session, redirect if not accessing auth routes
     if (!session) {
-        if (isAuthRoute) {
-            return NextResponse.next();
-        }
-        return NextResponse.redirect(new URL('/signin', req.nextUrl));
+        console.log("No session found");
+        return isAuthRoute ? NextResponse.next() : NextResponse.redirect(new URL('/signin', req.nextUrl));
     }
 
-    if (session?.role === 'admin') {
+    // Admin access
+    if (session.role === 'admin') {
+        console.log("Admin access granted");
         return NextResponse.next();
     }
 
-    if (session?.role === 'sales' && isAdminRoute)
+    // Sales user accessing admin route
+    if (session.role === 'sales' && isAdminRoute) {
+        console.log("Sales user redirected from admin route");
         return NextResponse.redirect(new URL('/sales/pos', req.nextUrl));
+    }
 
+    console.log("Access granted for user");
     return NextResponse.next();
 }

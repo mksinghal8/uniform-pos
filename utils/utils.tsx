@@ -360,3 +360,40 @@ export function generateBillTemplate(invoiceDetails) {
 
   return thermalPrintTemplate;
 }
+
+//Function To format Data for createSalesOrder
+export function formatSalesRecordData(data) {
+  const totalItems = data.cart.reduce((sum, item) => sum + parseInt(item.quantityInCart, 10), 0);
+  const totalAmount = data.cart.reduce((sum, item) => sum + (parseFloat(item.selling_price) * parseInt(item.quantityInCart, 10)), 0);
+  
+  const products = data.cart.map(item => ({
+    uuid: item.uuid,
+    name: item.name,
+    imageUrl: item.all_images[0] || "", // Assuming you want the first image URL
+    sellingPrice: item.selling_price,
+    categories: item.categories_data.map(cat => cat.name), // Extract category names
+    quantity: item.quantityInCart
+  }));
+
+  const res =  {
+    products: [...products],
+    totalAmount: parseFloat(220),
+    totalItems:totalItems,
+    discount: parseFloat(data.discount),
+    salesman:"Rahul",
+    helper:"Mukul",
+    type:"Cash"
+  };
+
+  console.log("Mayank u got: ",res);
+
+  return {
+    totalAmount,
+    products: [...products],
+    totalItems:totalItems,
+    discount: parseFloat(data.discount),
+    salesman:"Rahul",
+    helper:"Mukul",
+    type:"Cash"
+  };
+}
