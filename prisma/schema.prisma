@@ -27,7 +27,9 @@ model SalesRecord {
   totalItems  Int
   discount    Float     
   totalAmount Float     
-  salesman    String    
+  salesMan    String    
   helper      String    
-  type        String    
+  type        String
+  customer    Json
+  paymentMode String    
 }

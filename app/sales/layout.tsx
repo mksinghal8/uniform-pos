@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 import StaffLayout from '@/components/Layouts/StaffLayout';
 import ECommerce from '@/components/Dashboard/E-commerce';
 import { ResizableDemo } from './Resizable';
+import { useSession } from '@/hooks/useSession';
+import { useEffect } from 'react';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -22,6 +24,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
     <>
       <StaffLayout>

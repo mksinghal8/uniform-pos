@@ -7,10 +7,12 @@ import useCreateOrder from '@/hooks/useCreateOrder';
 import Bill from './Bill';
 import { formatSalesRecordData, generateBillTemplate } from '@/utils/utils';
 import { useCreateSalesRecord } from '@/hooks/useCreateSalesRecord';
+import useSessionStore from '@/store_zustand/sessionStore';
 
 export default function SalesCart2() {
   const iframeRef = useRef();
 
+  const { session, setSession } = useSessionStore();
   const handlePrint = (invoiceDetails) => {
     const iframe = iframeRef.current;
     const doc = iframe.contentDocument || iframe.contentWindow.document;
@@ -30,8 +32,10 @@ export default function SalesCart2() {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('+91');
   const [subtotal, setSubTotal] = useState(0);
-  const [discount, setDiscount] = useState(0);
-  const [cashByCustomer, setcashByCustomer] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const [discount, setDiscount] = useState();
+  const [cashByCustomer, setcashByCustomer] = useState();
+  const [amountToReturn, setAmountToReturn] = useState<Number>();
   const [paymentMode, setPaymentMode] = useState('Cash'); // Default value
 
   const handlePaymentModeChange = (event) => {
@@ -58,8 +62,33 @@ export default function SalesCart2() {
     const total = cart.reduce((acc, item) => {
       return acc + item.selectedVariant.selling_price * item.quantityInCart;
     }, 0);
+
+    const totalItems = cart.reduce((acc, item) => {
+      return acc + item.quantityInCart;
+    }, 0);
+
     setSubTotal(total);
+    setTotalItems(totalItems);
   }, [cart]);
+
+  useEffect(() => {
+    if (!cashByCustomer) {
+        setAmountToReturn(0);
+        return;
+    }
+    const parsedSubtotal = parseInt(subtotal);
+    const parsedCashByCustomer = parseInt(cashByCustomer) || 0;
+    const parsedDiscount = parseInt(discount) || 0;
+    const totalAmount = subtotal - parsedDiscount;
+
+    if (parsedCashByCustomer >= totalAmount) {
+        setAmountToReturn(parsedCashByCustomer - totalAmount);
+    } else {
+        setAmountToReturn(0);
+    }
+}, [subtotal, cashByCustomer, discount]);
+
+
 
   // Use the createOrder mutation
   const {
@@ -74,26 +103,6 @@ export default function SalesCart2() {
     error: createSalesRecordError,
   } = useCreateSalesRecord();
 
-  const fakeSalesRecord = {
-    "products": [
-        {
-            "uuid": "555f9bc6-dd28-45f8-88b0-ae4d3dbe9494",
-            "name": "PURPLE CHECK KURTI",
-            "imageUrl": "https://dms.mydukaan.io/original/jpeg/upload_file_service/0ded8676-f245-499d-82ac-bb54cf85355f/purplecheckkurti1.jpg",
-            "sellingPrice": "230.00",
-            "categories": [
-                "SARVODYA KANYA VIDYALAYA BURARI"
-            ],
-            "quantity": 1
-        }
-    ],
-    "totalAmount": 220.34,
-    "totalItems": 1,
-    "discount": 0,
-    "salesman": "Rahul",
-    "helper": "Mukul",
-    "type": "Cash"
-}
   const handleCompleteOrder = () => {
     const orderData = {
       line_items: cart.map((item) => ({
@@ -125,36 +134,33 @@ export default function SalesCart2() {
       payment_mode: 0, // Ensure this corresponds to actual payment modes
     };
 
-    // createOrder(orderData, {
-    //   onSuccess: (resp) => {
-    //     console.log("This is the response of the order: ", resp);
-    //     handlePrint({
-    //       customerDetails: { customerName, customerPhone },
-    //       cart,
-    //       discount,
-    //       paymentMode,
-    //     });
-    //   },
-    //   onError: (error) => {
-    //     console.error("Error completing the order:", error);
-    //   },
-    // });
+    createOrder(orderData, {
+      onSuccess: (resp) => {
+        console.log('This is the response of the order: ', resp);
+        handlePrint({
+          customerDetails: { customerName, customerPhone },
+          cart,
+          discount,
+          paymentMode,
+        });
+      },
+      onError: (error) => {
+        console.error('Error completing the order:', error);
+      },
+    });
 
     createSalesRecord(
       formatSalesRecordData({
         cart,
-        customerName,
-        customerPhone,
-        salesMan: 'SalesMan',
+        customer: { name: customerName, phone: customerPhone },
+        salesMan: session.userName || 'salesMan',
         helper: 'helper',
-        type: 'Sales',
+        type: 'Retail',
         paymentMode,
-        subtotal:'',
-        discount
+        subtotal: '',
+        discount,
       })
     );
-
-   // createSalesRecord(fakeSalesRecord);
   };
 
   return (
@@ -162,42 +168,47 @@ export default function SalesCart2() {
       {/* First Row: Two Input Texts with Labels */}
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="block mb-1 text-sm">Select Helper</label>
+          <label className="block mb-1 text-xs font-semibold">Sales By</label>
+          <p className="text-xs font-semibold text-slate-600 pl-1">{session && session.userName}</p>
+        </div>
+        <div>
+          <label className="block mb-1 text-xs font-semibold">Helper</label>
           {/* <input type="text" className="w-full p-1 border rounded" /> */}
           <select
             id="helper"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md p-1 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
           >
             <option>Select helper</option>
             <option>Helper 1</option>
             <option>Helper 2</option>
           </select>
         </div>
-        <div>
-          <label className="block mb-1 text-sm">SalesMan Name</label>
-          <p className="">Mayank</p>
-        </div>
       </div>
 
       {/* Second Row: Two Input Texts with Labels */}
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="block mb-1 text-sm">Customer Name</label>
+          <label className="block mb-1 text-xs font-semibold">
+            Customer Name
+          </label>
           <input
             type="text"
             id="input1"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md p-1 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
             placeholder="Walk In Customer"
             value={customerName}
             onChange={handleCustomerNameChange}
           />
         </div>
         <div>
-          <label className="block mb-1 text-sm">Customer Number</label>
+          <label className="block mb-1 text-xs font-semibold">
+            Customer Number
+          </label>
           <input
             type="text"
             id="input1"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            //className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md p-1 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
             placeholder="Enter first input"
             value={customerPhone}
             onChange={handleCustomerPhoneChange}
@@ -206,7 +217,7 @@ export default function SalesCart2() {
       </div>
 
       {/* Scrollable Vertical Div */}
-      <div className="h-95 overflow-y-scroll border rounded p-1">
+      <div className="h-95 overflow-y-scroll border-y border-slate-200 p-1">
         <ul className="p-1">
           {cart.map((product, index) => (
             <CartItemProduct index={index} product={product} />
@@ -215,8 +226,13 @@ export default function SalesCart2() {
       </div>
 
       {/* Information Div */}
-      <div className="p-4 rounde bg-slate-100">
+      <div className="p-2 rounded border-dotted border-2 border-slate-400 bg-slate-100">
         <div className="flex flex-col">
+          <div className="">
+            <p className="text-sm text-gray-400 text-center mb-2 font-satoshi">
+              # Summary for <span className="font-bold">{totalItems}</span> Items
+            </p>
+          </div>
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-400">Subtotal</p>
             <div className="flex items-center">
@@ -241,6 +257,8 @@ export default function SalesCart2() {
                 placeholder="Discount"
                 value={discount}
                 onChange={handleDiscountChange}
+                disabled={subtotal<=0}
+                pattern="\d*"
               />
             </div>
           </div>
@@ -251,7 +269,7 @@ export default function SalesCart2() {
                 Rs.
               </span>
               <span className="text-sm font-semibold text-gray-900 w-20 text-right">
-                {subtotal - discount}
+                {subtotal - discount || 0}
               </span>
             </div>
           </div>
@@ -336,7 +354,7 @@ export default function SalesCart2() {
                   Rs.
                 </span>
                 <span className="text-sm font-semibold text-gray-900 w-20 text-right">
-                  {cashByCustomer - (+subtotal - +discount)}
+                  {amountToReturn}
                 </span>
               </div>
             </div>
@@ -357,10 +375,10 @@ export default function SalesCart2() {
       {/* Hidden iframe for printing */}
       <iframe ref={iframeRef} style={{ display: 'none' }} title="Print Bill" />
 
-      {/* Render Bill content for printing */}
+      {/* Render Bill content for printing
       <div id="bill-content" style={{ display: 'none' }}>
         <Bill />
-      </div>
+      </div> */}
     </div>
   );
 }

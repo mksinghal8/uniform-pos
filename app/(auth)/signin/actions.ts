@@ -48,7 +48,7 @@ export async function signIn(_currentState: FormState, formData: FormData): Prom
 
     }
 
-    const session = await createSession(existingUser.id, existingUser.role);
+    const session = await createSession(existingUser.id, existingUser.role, existingUser.userName);
 
   } catch (error) {
     if (isRedirectError(error)) throw error;

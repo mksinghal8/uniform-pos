@@ -376,13 +376,15 @@ export function formatSalesRecordData(data) {
   }));
 
   const res =  {
+    totalAmount,
     products: [...products],
-    totalAmount: parseFloat(220),
     totalItems:totalItems,
     discount: parseFloat(data.discount),
-    salesman:"Rahul",
+    salesMan:data.salesMan,
     helper:"Mukul",
-    type:"Cash"
+    type:"Retail",
+    customer:data.customer,
+    paymentMode: data.paymentMode
   };
 
   console.log("Mayank u got: ",res);
@@ -392,8 +394,10 @@ export function formatSalesRecordData(data) {
     products: [...products],
     totalItems:totalItems,
     discount: parseFloat(data.discount),
-    salesman:"Rahul",
+    salesMan:data.salesMan,
     helper:"Mukul",
-    type:"Cash"
+    type:"Retail",
+    customer:data.customer,
+    paymentMode: data.paymentMode
   };
 }

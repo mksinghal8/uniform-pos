@@ -69,7 +69,7 @@ export default function Home() {
           </section>
 
           {/* Cart Section */}
-          <aside className="fixed right-0 top-0 w-3/12 bg-white shadow-md p-4 h-full">
+          <aside className="fixed right-0 top-0 w-3/12 bg-white shadow-md p-1 h-full">
             <SalesCart />
           </aside>
         </div>

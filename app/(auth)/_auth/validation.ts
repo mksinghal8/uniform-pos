@@ -33,6 +33,7 @@ export type SessionPayload = {
   userId: string | number;
   role: string
   expiresAt: Date;
+  userName: string
 };
 
 export type SignUpValues = z.infer<typeof signUpSchema>;

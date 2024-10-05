@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json(); // Get JSON data from the request
 
-    const { products, discount, salesman, helper, type, totalAmount } = body;
+    const { products, discount, salesMan, helper, type, totalAmount, customer, paymentMode } = body;
 
     // Calculate total items and total amount
     const totalItems = products.reduce((total, product) => total + product.quantity, 0);
@@ -20,12 +20,14 @@ export async function POST(req: NextRequest) {
         totalItems,
         discount,
         totalAmount,
-        salesman,
+        salesMan,
         helper,
         type,
         products: [
           ...products,
         ],
+        customer, 
+        paymentMode
       },
     });
 

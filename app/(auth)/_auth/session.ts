@@ -29,9 +29,9 @@ export async function decrypt(session: string | undefined = '') {
     }
 }
 
-export async function createSession(userId: string, role: string) {
+export async function createSession(userId: string, role: string ,userName: string) {
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000)
-    const session = await encrypt({ userId, expiresAt, role })
+    const session = await encrypt({ userId, expiresAt, role , userName})
     cookies().set('session', session, {
         httpOnly: true,
         secure: true,
@@ -49,7 +49,7 @@ export async function verifySession() {
         redirect('/login');
     }
 
-    return { isAuth: true, userId: Number(session.userId), role: session.role};
+    return { isAuth: true, userId: session.userId, role: session.role, userName: session.userName};
 };
 
 export function deleteSession() {

@@ -1,3 +1,4 @@
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import React, { useEffect, useRef } from 'react';
 
 interface ModalProps {
@@ -31,7 +32,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   return (
     <div style={overlayStyle}>
       <div ref={modalRef} style={modalStyle}>
-        <button onClick={onClose} style={closeButtonStyle}>Close</button>
+        {/* <button onClick={onClose} style={closeButtonStyle}>Close</button> */}
         {children}
       </div>
     </div>
@@ -56,9 +57,10 @@ const overlayStyle: React.CSSProperties = {
 
 const modalStyle: React.CSSProperties = {
   background: 'white',
-  padding: '20px',
+  //padding: '20px',
   borderRadius: '8px',
-  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+  //height:'200px'
 };
 
 const closeButtonStyle: React.CSSProperties = {

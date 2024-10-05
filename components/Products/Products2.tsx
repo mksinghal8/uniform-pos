@@ -7,6 +7,9 @@ import { useFetchCategories } from '@/hooks/useFetchCategories';
 import ProductCard2 from './ProductCard2';
 import CategoriesSlider from './CategorySlider';
 import Modal from './Modal';
+import ProductQuickView2 from './ProductQuickView2';
+import { useSession } from '@/hooks/useSession';
+import useSessionStore from '@/store_zustand/sessionStore';
 
 const SearchBar = ({ searchQuery, setSearchQuery }) => {
   const handleInputChange = (event) => {
@@ -58,7 +61,6 @@ const ProductGrid = ({ products, setOpen, setSelectedProduct }) => {
 };
 
 function Products2() {
-  const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(); //QuickView opens for selectedProduct
   const [searchQuery, setSearchQuery] = useState(null); //searck Key
   const { data: products, isLoading, isError } = useFetchProducts(); //fetchAllProducts -> this will be maintained in store too
@@ -70,9 +72,14 @@ function Products2() {
 
   const [productSearchResults, setProductSearchResults] = useState(); //local state for product Search Results -> changed on Category Click too
   const [categorySearchResults, setCategorySearchResults] = useState();
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const quickViewOff = () => setOpen(false);
+  const {session,setSession}= useSessionStore();
+  const { data: sessionData, isPending: isSessionPending, isError: isSessionError } = useSession()
+  useEffect(()=>{
+    setSession(sessionData);
+  },[isSessionPending])
+  
 
   useEffect(() => {
     const searchResultsProduct = products?.filter((product: any) =>
@@ -99,13 +106,16 @@ function Products2() {
     setCategorySearchResults(allCategories);
   }, [allProducts, allCategories]);
 
+  useEffect(()=>{
+    //useSession();
+  },[])
   if (isLoading || isCategoriesLoading) return <div>Loading...</div>;
   if (isError || isCategoriesError) return <div>Error: {isError}</div>;
 
   
 
   const toggleModal = () => {
-    setModalOpen(!isModalOpen);
+    setOpen(!open);
   };
 
   return (
@@ -121,7 +131,7 @@ function Products2() {
         setOpen={setOpen}
         setSelectedProduct={setSelectedProduct}
       />
-      {open && (
+      {/* {open && (
         <div className='mr-80'>
           <ProductQuickView
             productUuid={selectedProduct}
@@ -129,11 +139,13 @@ function Products2() {
             open={open}
           />
         </div>
-      )}
+      )} */}
       <button onClick={toggleModal}>Open Modal</button>
-      <Modal isOpen={isModalOpen} onClose={toggleModal}>
-        <h2>Modal Content</h2>
-        <p>This is a simple modal that closes when you click outside of it.</p>
+      <Modal isOpen={open} onClose={toggleModal}>
+      <ProductQuickView2
+            productUuid={selectedProduct}
+            onClose={toggleModal}
+          />
       </Modal>
     </div>
   );

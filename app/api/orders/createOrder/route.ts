@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     console.log("\n\n\n\n MAYANK \n",body,"\n\n\n\n MAYANK \n")
 
     // Ensure store ID is included
-    body.store = process.env.STORE_UUID;
+    body.store = storeId;
     if (!body.store) {
       console.log("Store is missong")
       return NextResponse.json({ error: 'Store ID is required.' }, { status: 400 });

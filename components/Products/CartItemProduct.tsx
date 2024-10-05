@@ -95,7 +95,7 @@ function CartItemProduct({ index, product }) {
 
 
   return (
-    <li className="space-y-3 py-6 text-left sm:flex-row sm:space-x-5 sm:space-y-0">
+    <li className="space-y-3 py-6 text-left sm:flex-row sm:space-x-5 sm:space-y-0 hover:bg-slate-100 transition duration-300 rounded border-b border-slate-200">
       <div className="grid grid-cols-5 gap-1">
         <div className="col-span-1">
           <img
@@ -110,10 +110,10 @@ function CartItemProduct({ index, product }) {
               {product.name}
             </p>
             <p className="text-sm font-semibold mb-2">
-              <del className="text-slate-500">
+              <del className="text-slate-500 text-xs">
                 Rs. {product.selectedVariant.original_price}
               </del>
-              &nbsp;Rs. {product.selectedVariant.selling_price}
+              &nbsp;&nbsp;&nbsp;Rs. {product.selectedVariant.selling_price}
             </p>
             <div className="text-xs font-semibold flex space-x-2 items-center">
               {product.variants.primaryAttribute && (

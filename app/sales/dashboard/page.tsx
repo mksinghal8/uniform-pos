@@ -1,11 +1,6 @@
-import Products from '@/components/Products/Products';
 import Products2 from '@/components/Products/Products2';
-import SalesCart from '@/components/Products/SalesCart';
 import SalesCart2 from '@/components/Products/SalesCart2';
-import VerticalFormComponent from '@/components/Products/VerticalComponent';
-import { useFetchAProduct } from '@/hooks/useFetchAProduct';
-import { useSession } from '@/hooks/useSession';
-import { useEffect } from 'react';
+
 
 export default function Page() {
   
@@ -18,7 +13,7 @@ export default function Page() {
       </section>
 
       {/* Cart Section */}
-      <aside className="fixed right-0 top-0 w-3/12 bg-white shadow-md p-1 h-full">
+      <aside className="fixed right-0 top-0 w-3/12 bg-white shadow-md p-4 h-full">
         <SalesCart2/>
       </aside>
     </>
