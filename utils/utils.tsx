@@ -401,3 +401,8 @@ export function formatSalesRecordData(data) {
     paymentMode: data.paymentMode
   };
 }
+
+//3 digit token generator
+export const tokenGenerator = () => {
+  return Math.floor(100 + Math.random() * 900);
+};

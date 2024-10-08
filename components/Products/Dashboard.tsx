@@ -35,13 +35,21 @@ const Dashboard: React.FC = () => {
     if (loading) return <p>Loading...</p>;
 
     return (
-        <div>
-            {sessionData ? (
-                <p>Welcome, User ID: {sessionData.userName}, Role: {sessionData.role}</p>
-            ) : (
-                <p>User is not authenticated</p>
-            )}
-        </div>
+        // <div>
+        //     {sessionData ? (
+        //         <p>Welcome, User ID: {sessionData.userName}, Role: {sessionData.role}</p>
+        //     ) : (
+        //         <p>User is not authenticated</p>
+        //     )}
+        // </div>
+        <div style={{ width: '100%', height: '500px', border: 'none' }}>
+      <iframe
+        src="https://web.mydukaan.io/orders?page=1&status=-3" // Replace with the URL you want to embed
+        title="External Content"
+        style={{ width: '100%', height: '100%' }}
+        frameBorder="0"
+      />
+    </div>
     );
 };
 

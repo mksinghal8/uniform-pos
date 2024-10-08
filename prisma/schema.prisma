@@ -33,3 +33,15 @@ model SalesRecord {
   customer    Json
   paymentMode String    
 }
+
+model SalesAssignment {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  helper      String
+  cartDetails Json
+  customer    Json
+  createdAt   DateTime @default(now())
+  status      String
+  token       Int      // Token field
+  salesMan    String   // Salesman field added as a string
+}
+

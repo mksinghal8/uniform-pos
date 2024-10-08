@@ -5,9 +5,10 @@ import { useEffect, useRef, useState } from 'react';
 import CartItemProduct from './CartItemProduct';
 import useCreateOrder from '@/hooks/useCreateOrder';
 import Bill from './Bill';
-import { formatSalesRecordData, generateBillTemplate } from '@/utils/utils';
+import { formatSalesRecordData, generateBillTemplate, tokenGenerator } from '@/utils/utils';
 import { useCreateSalesRecord } from '@/hooks/useCreateSalesRecord';
 import useSessionStore from '@/store_zustand/sessionStore';
+import { useCreateSalesAssignment } from '@/hooks/useCreateSalesAssignment';
 
 export default function SalesCart2() {
   const iframeRef = useRef();
@@ -33,10 +34,11 @@ export default function SalesCart2() {
   const [customerPhone, setCustomerPhone] = useState('+91');
   const [subtotal, setSubTotal] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
-  const [discount, setDiscount] = useState();
+  const [discount, setDiscount] = useState(0);
   const [cashByCustomer, setcashByCustomer] = useState();
   const [amountToReturn, setAmountToReturn] = useState<Number>();
   const [paymentMode, setPaymentMode] = useState('Cash'); // Default value
+  const [salesToken, setSalesToken] = useState(0);
 
   const handlePaymentModeChange = (event) => {
     setPaymentMode(event.target.value);
@@ -103,6 +105,12 @@ export default function SalesCart2() {
     error: createSalesRecordError,
   } = useCreateSalesRecord();
 
+  const {
+    mutate: createSalesAssignment,
+    isPending: pendingCreateSalesAssignment,
+    error: errorCreateSalesAssignment,
+  } = useCreateSalesAssignment();
+
   const handleCompleteOrder = () => {
     const orderData = {
       line_items: cart.map((item) => ({
@@ -162,6 +170,20 @@ export default function SalesCart2() {
       })
     );
   };
+
+  //Function to create salesAssignment
+  const salesAssignment = ()=>{
+    const currentToken = tokenGenerator();
+    setSalesToken(currentToken);
+    createSalesAssignment({
+      helper:'helper',
+      cartDetails:cart,
+      customer: { name: customerName, phone: customerPhone },
+      status:"Pending",
+      token:currentToken,
+      salesMan: session.userName || 'salesMan',
+    })
+  }
 
   return (
     <div className="flex flex-col p-1 space-y-1">
@@ -363,14 +385,34 @@ export default function SalesCart2() {
       </div>
 
       {/* Button */}
-      <button
+      {/* <button
         className="mt-4 bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
         type="button"
         onClick={handleCompleteOrder}
         disabled={pendingCreateOrder}
       >
         Process Order
-      </button>
+      </button> */}
+
+<div className="grid grid-cols-5 gap-4">
+  <button
+    className="col-span-1 mt-1 bg-blue-500 text-white  rounded hover:bg-blue-600"
+    type="button"
+    onClick={salesAssignment}
+  >
+    Other Action
+  </button>
+
+  <button
+    className="col-span-4 mt-1 bg-blue-500 text-white  rounded hover:bg-blue-600"
+    type="button"
+    onClick={handleCompleteOrder}
+    disabled={pendingCreateOrder}
+  >
+    Process Order
+  </button>
+</div>
+      
 
       {/* Hidden iframe for printing */}
       <iframe ref={iframeRef} style={{ display: 'none' }} title="Print Bill" />
