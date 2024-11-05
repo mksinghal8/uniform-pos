@@ -43,6 +43,7 @@ interface SalesCartStore {
   addToCart: (product: Product) => void;
   removeFromCart: (productId: number) => void;
   updateCartItem: (index: number, updatedProduct: Partial<Product>) => void;
+  replaceCart:(cart:SalesCartStore)=>void
 }
 
 export const useSalesCartStore = create<SalesCartStore>((set) => ({
@@ -55,6 +56,7 @@ export const useSalesCartStore = create<SalesCartStore>((set) => ({
   paymentMode: { mode: 'Cash', cashPaid: 0, amountToReturn: 0 }, // Default value for Cash
   remarks: '', // Default remarks
 
+  replaceCart: (newCart) => set({ cart: newCart }),
   updateState: (partialState) => set(state => ({ ...state, ...partialState })),
   addToCart: (product) => set(state => ({
     cart: [...state.cart, product]

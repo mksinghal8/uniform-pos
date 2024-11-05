@@ -406,3 +406,26 @@ export function formatSalesRecordData(data) {
 export const tokenGenerator = () => {
   return Math.floor(100 + Math.random() * 900);
 };
+
+//The following function will make api call
+export const setCurrentOrderToDone = async (id,status) => {
+  try {
+    const response = await fetch('/api/ssu/salesAssignment', { // Replace with your actual endpoint
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id, status }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    //setMessage(`Record updated: ${JSON.stringify(data.updatedSalesAssignment)}`);
+  } catch (error) {
+    console.error('Error updating record:', error);
+    //setMessage('Failed to update record');
+  }
+};

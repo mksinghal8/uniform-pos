@@ -5,10 +5,15 @@ import { useEffect, useRef, useState } from 'react';
 import CartItemProduct from './CartItemProduct';
 import useCreateOrder from '@/hooks/useCreateOrder';
 import Bill from './Bill';
-import { formatSalesRecordData, generateBillTemplate, tokenGenerator } from '@/utils/utils';
+import {
+  formatSalesRecordData,
+  generateBillTemplate,
+  tokenGenerator,
+} from '@/utils/utils';
 import { useCreateSalesRecord } from '@/hooks/useCreateSalesRecord';
 import useSessionStore from '@/store_zustand/sessionStore';
 import { useCreateSalesAssignment } from '@/hooks/useCreateSalesAssignment';
+import useSalesAssignmentStore from '@/store_zustand/saleAssignmentsStore';
 
 export default function SalesCart2() {
   const iframeRef = useRef();
@@ -26,8 +31,9 @@ export default function SalesCart2() {
     iframe.contentWindow.print();
   };
 
-  const { cart } = useSalesCartStore((state) => ({
+  const { cart, replaceCart } = useSalesCartStore((state) => ({
     cart: state.cart,
+    replaceCart: state.replaceCart
   }));
 
   const [customerName, setCustomerName] = useState('');
@@ -75,8 +81,8 @@ export default function SalesCart2() {
 
   useEffect(() => {
     if (!cashByCustomer) {
-        setAmountToReturn(0);
-        return;
+      setAmountToReturn(0);
+      return;
     }
     const parsedSubtotal = parseInt(subtotal);
     const parsedCashByCustomer = parseInt(cashByCustomer) || 0;
@@ -84,13 +90,11 @@ export default function SalesCart2() {
     const totalAmount = subtotal - parsedDiscount;
 
     if (parsedCashByCustomer >= totalAmount) {
-        setAmountToReturn(parsedCashByCustomer - totalAmount);
+      setAmountToReturn(parsedCashByCustomer - totalAmount);
     } else {
-        setAmountToReturn(0);
+      setAmountToReturn(0);
     }
-}, [subtotal, cashByCustomer, discount]);
-
-
+  }, [subtotal, cashByCustomer, discount]);
 
   // Use the createOrder mutation
   const {
@@ -171,27 +175,71 @@ export default function SalesCart2() {
     );
   };
 
+  const {
+    allSalesAssignments,
+    setAllSalesAssignments,
+    updateSalesAssignments,
+  } = useSalesAssignmentStore((state) => ({
+    allSalesAssignments: state.allSalesAssignments,
+    setAllSalesAssignments: state.setAllSalesAssignments,
+    updateSalesAssignments: state.updateSalesAssignments,
+  }));
+
+  //This function is called when we use salesAssignment from sales which is about to happen
+  const handleReplaceCartChange = (event) => {
+    const selectedSalesAssignment = allSalesAssignments.find(
+      (salesAssignment) => salesAssignment.customer.name === event.target.value
+    );
+
+    console.log("I have found:", selectedSalesAssignment)
+    if (selectedSalesAssignment) {
+      replaceCart(selectedSalesAssignment.cartDetails)
+      console.log("I have replaced cart")
+    }
+  };
+
   //Function to create salesAssignment
-  const salesAssignment = ()=>{
+  const salesAssignment = () => {
+    //Add to local Store also
+
     const currentToken = tokenGenerator();
-    setSalesToken(currentToken);
-    createSalesAssignment({
-      helper:'helper',
-      cartDetails:cart,
+    const currentSalesAssignment = {
+      helper: 'helper',
+      cartDetails: cart,
       customer: { name: customerName, phone: customerPhone },
-      status:"Pending",
-      token:currentToken,
+      status: 'Pending',
+      token: currentToken,
       salesMan: session.userName || 'salesMan',
-    })
-  }
+    };
+
+    console.log('Mayank cart: ', currentSalesAssignment);
+    setAllSalesAssignments(currentSalesAssignment);
+
+    setSalesToken(currentToken);
+    createSalesAssignment(currentSalesAssignment);
+  };
 
   return (
     <div className="flex flex-col p-1 space-y-1">
       {/* First Row: Two Input Texts with Labels */}
       <div className="grid grid-cols-2 gap-2">
-        <div>
+        {/* <div>
           <label className="block mb-1 text-xs font-semibold">Sales By</label>
           <p className="text-xs font-semibold text-slate-600 pl-1">{session && session.userName}</p>
+        </div> */}
+        <div>
+          <label className="block mb-1 text-xs font-semibold">Sales Assignments</label>
+          {/* <input type="text" className="w-full p-1 border rounded" /> */}
+          <select
+            id="helper"
+            className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md p-1 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+            onChange={handleReplaceCartChange}
+          >
+            <option>Select Pending Sales</option>
+            {allSalesAssignments.map((salesAssignment) => (
+              <option key={salesAssignment.id}>{salesAssignment.customer.name}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label className="block mb-1 text-xs font-semibold">Helper</label>
@@ -252,7 +300,8 @@ export default function SalesCart2() {
         <div className="flex flex-col">
           <div className="">
             <p className="text-sm text-gray-400 text-center mb-2 font-satoshi">
-              # Summary for <span className="font-bold">{totalItems}</span> Items
+              # Summary for <span className="font-bold">{totalItems}</span>{' '}
+              Items
             </p>
           </div>
           <div className="flex items-center justify-between">
@@ -279,7 +328,7 @@ export default function SalesCart2() {
                 placeholder="Discount"
                 value={discount}
                 onChange={handleDiscountChange}
-                disabled={subtotal<=0}
+                disabled={subtotal <= 0}
                 pattern="\d*"
               />
             </div>
@@ -394,25 +443,24 @@ export default function SalesCart2() {
         Process Order
       </button> */}
 
-<div className="grid grid-cols-5 gap-4">
-  <button
-    className="col-span-1 mt-1 bg-blue-500 text-white  rounded hover:bg-blue-600"
-    type="button"
-    onClick={salesAssignment}
-  >
-    Other Action
-  </button>
+      <div className="grid grid-cols-6 gap-4">
+        <button
+          className="col-span-2 mt-1 bg-blue-500 text-white  rounded hover:bg-blue-600"
+          type="button"
+          onClick={salesAssignment}
+        >
+          Assign Sale
+        </button>
 
-  <button
-    className="col-span-4 mt-1 bg-blue-500 text-white  rounded hover:bg-blue-600"
-    type="button"
-    onClick={handleCompleteOrder}
-    disabled={pendingCreateOrder}
-  >
-    Process Order
-  </button>
-</div>
-      
+        <button
+          className="col-span-4 mt-1 bg-blue-500 text-white  rounded hover:bg-blue-600"
+          type="button"
+          onClick={handleCompleteOrder}
+          disabled={pendingCreateOrder}
+        >
+          Process Order
+        </button>
+      </div>
 
       {/* Hidden iframe for printing */}
       <iframe ref={iframeRef} style={{ display: 'none' }} title="Print Bill" />
