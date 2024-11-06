@@ -3,9 +3,6 @@ import { verifySession } from '../../(auth)/_auth/session'; // Adjust the import
 
 export async function GET(req: NextRequest) {
     const session = await verifySession(); // Assuming verifySession can take a cookie
-
-    console.log("Session is: ", session);
-
     if (!session?.role) {
         return NextResponse.json({ isAuth: false }, { status: 401 });
     }

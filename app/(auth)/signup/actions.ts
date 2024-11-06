@@ -7,7 +7,6 @@ import bcrypt from "bcrypt";
 // @ts-ignore
 export async function signUp(_currentState: FormState, formData: FormData): Promise<FormState> {
   //1. Validate Fields
-  console.log("Attemoting signup")
   const validationResult = signUpSchema.safeParse({
     username: formData.get('username'),
     password: formData.get('password')

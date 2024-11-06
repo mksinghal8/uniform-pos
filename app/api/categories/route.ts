@@ -13,7 +13,6 @@ export async function GET(req: NextRequest) {
 
     // Check if response is valid
     if (response) {
-      console.log('Fetched products are: ', response);
       return NextResponse.json(response);
     }
 

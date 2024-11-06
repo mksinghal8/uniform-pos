@@ -4,7 +4,6 @@ import { useSalesCartStore } from '@/store_zustand/salesCartStore2';
 import { useEffect, useRef, useState } from 'react';
 import CartItemProduct from './CartItemProduct';
 import useCreateOrder from '@/hooks/useCreateOrder';
-import Bill from './Bill';
 import {
   formatSalesRecordData,
   generateBillTemplate,

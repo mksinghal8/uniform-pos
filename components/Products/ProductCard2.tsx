@@ -24,7 +24,6 @@ const ProductCard2: React.FC<ProductCardProps> = ({
   // const imagePlaceholder = '../../assets/noImage.jpg'
 
   // Use the default image if imageUrl is not valid or is an empty string
-  console.log("MAYANK,",imagePlaceholder);
   const finalImageUrl = imageUrl==="https://api.mydukaan.io/static/images/category-def.jpg" ? imagePlaceholder.src : imageUrl;
   return (
     <div className="max-w-lg mx-1 my-2 bg-white border border-slate-200 rounded-lg flex overflow-hidden transition-transform duration-300 hover:scale-105">

@@ -67,8 +67,6 @@ function CartItemProduct({ index, product }) {
 
   const handlePrimaryVariantChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newPrimaryVariant = event.target.value;
-    console.log("You selected:", newPrimaryVariant);
-  
     const updatedProduct = {
       ...product,
       selectedVariant: product.variants.data[newPrimaryVariant][selectedSecondaryVariant],

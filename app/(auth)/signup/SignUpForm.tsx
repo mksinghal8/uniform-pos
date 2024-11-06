@@ -19,7 +19,6 @@ function LoginButton() {
     const { pending } = useFormStatus();
     //@ts-ignore
     const handleClick = (event) => {
-        console.log('You clicked me');
         if (pending) {
             event.preventDefault();
         }

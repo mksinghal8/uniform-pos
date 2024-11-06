@@ -15,7 +15,6 @@ export async function GET(
 
     // Check if response is valid
     if (response) {
-      console.log('Fetched products are: ', response);
       return NextResponse.json(response);
     }
 

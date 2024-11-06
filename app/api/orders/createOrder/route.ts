@@ -8,9 +8,6 @@ export async function POST(req: NextRequest) {
   try {
     // Parse the request body
     const body = await req.json();
-
-    console.log("\n\n\n\n MAYANK \n",body,"\n\n\n\n MAYANK \n")
-
     // Ensure store ID is included
     body.store = storeId;
     if (!body.store) {
@@ -37,7 +34,6 @@ export async function POST(req: NextRequest) {
     }
   } catch (error) {
     // Handle any other errors (e.g., parsing issues)
-    console.log("\n\n\nSINGHAL\n\n",error);
     return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });
   }
 }
