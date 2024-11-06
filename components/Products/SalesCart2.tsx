@@ -35,34 +35,48 @@ export default function SalesCart2() {
     replaceCart: state.replaceCart
   }));
 
-  const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('+91');
-  const [subtotal, setSubTotal] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
-  const [discount, setDiscount] = useState(0);
-  const [cashByCustomer, setcashByCustomer] = useState();
-  const [amountToReturn, setAmountToReturn] = useState<Number>();
-  const [paymentMode, setPaymentMode] = useState('Cash'); // Default value
-  const [salesToken, setSalesToken] = useState(0);
 
-  const handlePaymentModeChange = (event) => {
-    setPaymentMode(event.target.value);
+  const [salesData, setSalesData] = useState({
+    customerName: '',
+    customerPhone: '+91',
+    discount: 0,
+    paymentMode: 'Cash', // Default value
+    cashByCustomer: undefined,
+    amountToReturn: undefined,
+    subtotal: 0,
+    totalItems: 0,
+    salesToken: 0
+  });
+
+  const {customerName,customerPhone,discount,paymentMode,cashByCustomer,amountToReturn,subtotal,totalItems,salesToken} = salesData;
+  
+  // Update specific fields within salesData
+  const updateSalesData = (field, value) => {
+    setSalesData(prevState => ({
+      ...prevState,
+      [field]: value
+    }));
   };
 
-  const handleDiscountChange = (e) => {
-    setDiscount(e.target.value);
-  };
 
   const handleCustomerNameChange = (e) => {
-    setCustomerName(e.target.value);
+    updateSalesData('customerName',e.target.value)
   };
 
   const handleCustomerPhoneChange = (e) => {
-    setCustomerPhone(e.target.value);
+    updateSalesData('customerPhone',e.target.value)
+  };
+
+  const handleDiscountChange = (e) => {
+    updateSalesData('discount',e.target.value)
+  };
+
+  const handlePaymentModeChange = (e) => {
+    updateSalesData('paymentMode',e.target.value)
   };
 
   const handleCashByCustomerChange = (e) => {
-    setcashByCustomer(e.target.value);
+    updateSalesData('cashByCustomer',e.target.value)
   };
 
   useEffect(() => {
@@ -74,24 +88,25 @@ export default function SalesCart2() {
       return acc + item.quantityInCart;
     }, 0);
 
-    setSubTotal(total);
-    setTotalItems(totalItems);
+    updateSalesData('subtotal',total);
+    updateSalesData('totalItems',totalItems);
+    
   }, [cart]);
 
   useEffect(() => {
     if (!cashByCustomer) {
-      setAmountToReturn(0);
+      updateSalesData('amountToReturn',0)
       return;
     }
-    const parsedSubtotal = parseInt(subtotal);
     const parsedCashByCustomer = parseInt(cashByCustomer) || 0;
-    const parsedDiscount = parseInt(discount) || 0;
+    const parsedDiscount = discount || 0;
     const totalAmount = subtotal - parsedDiscount;
 
     if (parsedCashByCustomer >= totalAmount) {
-      setAmountToReturn(parsedCashByCustomer - totalAmount);
+      updateSalesData('amountToReturn',parsedCashByCustomer - totalAmount);
     } else {
-      setAmountToReturn(0);
+      updateSalesData('amountToReturn',0);
+      
     }
   }, [subtotal, cashByCustomer, discount]);
 
@@ -114,6 +129,7 @@ export default function SalesCart2() {
     error: errorCreateSalesAssignment,
   } = useCreateSalesAssignment();
 
+  //Mayank: Make a function in utils that return object wgich is accepted by the api
   const handleCompleteOrder = () => {
     const orderData = {
       line_items: cart.map((item) => ({
@@ -214,7 +230,7 @@ export default function SalesCart2() {
     console.log('Mayank cart: ', currentSalesAssignment);
     setAllSalesAssignments(currentSalesAssignment);
 
-    setSalesToken(currentToken);
+    updateSalesData('salesToken',currentToken);
     createSalesAssignment(currentSalesAssignment);
   };
 
